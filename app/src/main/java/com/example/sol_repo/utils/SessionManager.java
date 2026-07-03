@@ -37,6 +37,10 @@ public class SessionManager {
         return preferences.getString(KEY_FULL_NAME, "");
     }
 
+    public int getCustomerId() {
+        return preferences.getInt(KEY_CUSTOMER_ID, 0);
+    }
+
     public String getEmail() {
         return preferences.getString(KEY_EMAIL, "");
     }
