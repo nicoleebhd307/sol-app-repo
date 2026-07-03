@@ -1,3 +1,28 @@
 <resources>
-    <string name="app_name">sol-repo</string>
+    <string name="app_name">Sol An Bang</string>
+    <string name="brand_name">SOL AN BANG</string>
+    <string name="brand_tagline">LUXURY REDEFINED</string>
+    <string name="logo_content_description">Sol An Bang logo</string>
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Sign in to continue your luxury escape</string>
+    <string name="email_hint">Email address</string>
+    <string name="password_hint">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="password_show">Show</string>
+    <string name="password_hide">Hide</string>
+    <string name="error_email_required">Please enter your email address</string>
+    <string name="error_password_required">Please enter your password</string>
+    <string name="login_invalid_message">Email or password is incorrect</string>
+    <string name="login_database_error">Mock database could not be loaded</string>
+    <string name="forgot_password_message">Password reset will be available soon</string>
+    <string name="sign_up_message">Sign up flow will be added in the next screen</string>
+    <string name="dashboard_title">Guest Dashboard</string>
+    <string name="dashboard_welcome_customer">Welcome, %1$s</string>
+    <string name="dashboard_account_summary">Account: %1$s\nStatus: %2$s</string>
+    <string name="dashboard_intro">Login succeeded with the local SQLite mock data. Firebase can replace this DAL later without changing the UI flow.</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Sol An Bang</string>
+    <string name="brand_name">SOL AN BANG</string>
+    <string name="brand_tagline">ĐẲNG CẤP NGHỈ DƯỠNG</string>
+    <string name="logo_content_description">Logo Sol An Bang</string>
+    <string name="login_title">Chào mừng trở lại</string>
+    <string name="login_subtitle">Đăng nhập để tiếp tục kỳ nghỉ sang trọng</string>
+    <string name="email_hint">Địa chỉ email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="remember_me">Ghi nhớ đăng nhập</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="sign_in">Đăng nhập</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="password_show">Hiện</string>
+    <string name="password_hide">Ẩn</string>
+    <string name="error_email_required">Vui lòng nhập email</string>
+    <string name="error_password_required">Vui lòng nhập mật khẩu</string>
+    <string name="login_invalid_message">Email hoặc mật khẩu không đúng</string>
+    <string name="login_database_error">Không thể tải database mock</string>
+    <string name="forgot_password_message">Chức năng đặt lại mật khẩu sẽ được bổ sung sau</string>
+    <string name="sign_up_message">Luồng đăng ký sẽ được thêm ở màn hình tiếp theo</string>
+    <string name="dashboard_title">Bảng điều khiển khách hàng</string>
+    <string name="dashboard_welcome_customer">Xin chào, %1$s</string>
+    <string name="dashboard_account_summary">Tài khoản: %1$s\nTrạng thái: %2$s</string>
+    <string name="dashboard_intro">Đăng nhập thành công bằng dữ liệu SQLite mock local. Sau này có thể thay DAL này bằng Firebase mà không đổi luồng giao diện.</string>
+    <string name="sign_out">Đăng xuất</string>
+</resources>

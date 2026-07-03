@@ -1,8 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Solrepo" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.Solrepo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/sol_gold</item>
+        <item name="colorPrimaryDark">@color/sol_gold_dark</item>
+        <item name="colorAccent">@color/sol_gold</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/sol_background</item>
     </style>
 
     <style name="Theme.Solrepo" parent="Base.Theme.Solrepo" />
