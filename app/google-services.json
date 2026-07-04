@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "842237777917",
+    "firebase_url": "https://sol-app-aaf25-default-rtdb.firebaseio.com",
+    "project_id": "sol-app-aaf25",
+    "storage_bucket": "sol-app-aaf25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842237777917:android:a7350d9d3318ca0a5d6b94",
+        "android_client_info": {
+          "package_name": "com.example.sol_repo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAyi13CjgPcMElx9hxh9xAkNJFv4Sl_bc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

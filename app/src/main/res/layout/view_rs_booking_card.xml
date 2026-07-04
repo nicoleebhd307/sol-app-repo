@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dashboard_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="86dp"
+        android:layout_height="66dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/imgRsRoom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/detail_room_photo"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_login" />
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtRsRoomType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/inter"
+            android:letterSpacing="0.05"
+            android:singleLine="true"
+            android:textColor="@color/sol_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="BEACH VILLA" />
+
+        <TextView
+            android:id="@+id/txtRsRoomNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/inter"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="12sp"
+            tools:text="Room V301" />
+
+        <TextView
+            android:id="@+id/txtRsBookingCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/inter"
+            android:textColor="@color/sol_gold_dark"
+            android:textSize="12sp"
+            tools:text="Booking ID: BK-2026-1046" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/sol_border" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imgRsSideIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_clock" />
+
+        <TextView
+            android:id="@+id/txtRsSideLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:text="@string/rs_estimated_delivery"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/txtRsSideValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:text="@string/rs_eta_value"
+            android:textColor="@color/sol_text_primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

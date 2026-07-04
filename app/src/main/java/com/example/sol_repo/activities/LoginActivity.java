@@ -12,18 +12,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sol_repo.R;
-import com.example.sol_repo.dals.MockDatabaseDal;
+import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.Customer;
 import com.example.sol_repo.utils.SessionManager;
-
-import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private CheckBox rememberCheckBox;
     private TextView signInButton;
-    private MockDatabaseDal mockDatabaseDal;
+    private FirebaseDatabaseDal firebaseDatabaseDal;
     private SessionManager sessionManager;
     private boolean passwordVisible = false;
 
@@ -32,11 +30,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mockDatabaseDal = new MockDatabaseDal(this);
+        firebaseDatabaseDal = new FirebaseDatabaseDal();
         sessionManager = new SessionManager(this);
 
         bindViews();
-        prepareMockData();
         setupClickListeners();
     }
 
@@ -45,15 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.edtPassword);
         rememberCheckBox = findViewById(R.id.chkRememberMe);
         signInButton = findViewById(R.id.btnSignIn);
-    }
-
-    private void prepareMockData() {
-        try {
-            mockDatabaseDal.prepareDatabase();
-        } catch (IOException exception) {
-            Toast.makeText(this, R.string.login_database_error, Toast.LENGTH_LONG).show();
-            signInButton.setEnabled(false);
-        }
     }
 
     private void setupClickListeners() {
@@ -82,16 +70,28 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        Customer customer = mockDatabaseDal.loginCustomer(email, password);
-        if (customer == null) {
-            Toast.makeText(this, R.string.login_invalid_message, Toast.LENGTH_SHORT).show();
-            return;
-        }
+        signInButton.setEnabled(false);
+        firebaseDatabaseDal.loginCustomer(email, password, new com.example.sol_repo.dals.FirebaseCallback<Customer>() {
+            @Override
+            public void onSuccess(Customer customer) {
+                signInButton.setEnabled(true);
+                if (customer == null) {
+                    Toast.makeText(LoginActivity.this, R.string.login_invalid_message, Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-        sessionManager.saveLoginSession(customer, rememberCheckBox.isChecked());
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
+                sessionManager.saveLoginSession(customer, rememberCheckBox.isChecked());
+                Intent intent = new Intent(LoginActivity.this, AccountActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                signInButton.setEnabled(true);
+                Toast.makeText(LoginActivity.this, R.string.login_database_error, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void togglePasswordVisibility(android.view.View toggleView) {

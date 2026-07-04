@@ -22,7 +22,7 @@ public class SessionManager {
     public void saveLoginSession(Customer customer, boolean rememberMe) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(KEY_REMEMBER_ME, rememberMe);
-        editor.putInt(KEY_CUSTOMER_ID, customer.getCustomerId());
+        editor.putString(KEY_CUSTOMER_ID, customer.getCustomerId());
         editor.putString(KEY_FULL_NAME, customer.getFullName());
         editor.putString(KEY_EMAIL, customer.getEmail());
         editor.putString(KEY_STATUS, customer.getStatus());
@@ -37,8 +37,12 @@ public class SessionManager {
         return preferences.getString(KEY_FULL_NAME, "");
     }
 
-    public int getCustomerId() {
-        return preferences.getInt(KEY_CUSTOMER_ID, 0);
+    public String getCustomerId() {
+        return preferences.getString(KEY_CUSTOMER_ID, null);
+    }
+
+    public boolean hasSession() {
+        return getCustomerId() != null;
     }
 
     public String getEmail() {

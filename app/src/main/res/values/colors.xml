@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="sol_background">#FFF9F1E7</color>
+    <color name="sol_background">#FFFAF8F6</color>
     <color name="sol_surface">#FFFFFFFF</color>
     <color name="sol_cream">#FFFFFBF5</color>
     <color name="sol_gold">#FFC79E35</color>

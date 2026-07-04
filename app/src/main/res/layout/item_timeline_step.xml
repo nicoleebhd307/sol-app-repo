@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/frameStepDot"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_circle_ring">
+
+        <ImageView
+            android:id="@+id/imgStepCheck"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_check"
+            android:tint="@color/white"
+            android:visibility="gone"
+            tools:ignore="UseAppTint" />
+
+        <View
+            android:id="@+id/dotStepCurrent"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_circle_gold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/txtStepLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/inter"
+        android:gravity="center"
+        android:textColor="@color/sol_text_secondary"
+        android:textSize="10sp"
+        tools:text="Preparing" />
+
+    <TextView
+        android:id="@+id/txtStepTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/inter"
+        android:gravity="center"
+        android:textColor="@color/sol_text_secondary"
+        android:textSize="9sp"
+        android:visibility="gone"
+        tools:text="10:50 AM" />
+</LinearLayout>

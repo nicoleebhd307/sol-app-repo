@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@color/sol_surface"
+    android:elevation="8dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
+
+    <include layout="@layout/nav_item_home" />
+
+    <include layout="@layout/nav_item_stay" />
+
+    <include layout="@layout/nav_item_services" />
+
+    <include layout="@layout/nav_item_profile" />
+</LinearLayout>

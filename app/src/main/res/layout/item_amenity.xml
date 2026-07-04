@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="48dp"
+    android:background="@drawable/bg_amenity_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="10dp">
+
+    <ImageView
+        android:id="@+id/imgAmenityIcon"
+        android:layout_width="19dp"
+        android:layout_height="19dp"
+        android:contentDescription="@null"
+        tools:src="@drawable/ic_wifi" />
+
+    <TextView
+        android:id="@+id/txtAmenityName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:fontFamily="@font/inter"
+        android:singleLine="true"
+        android:textColor="@color/sol_text_primary"
+        android:textSize="13sp"
+        tools:text="Free Wi-Fi" />
+</LinearLayout>

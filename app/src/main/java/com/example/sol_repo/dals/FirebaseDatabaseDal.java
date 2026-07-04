@@ -1,0 +1,726 @@
+package com.example.sol_repo.dals;
+
+import com.example.sol_repo.models.BookingCreationResult;
+import com.example.sol_repo.models.BookingSummary;
+import com.example.sol_repo.models.Customer;
+import com.example.sol_repo.models.HomeServiceItem;
+import com.example.sol_repo.models.MenuItem;
+import com.example.sol_repo.models.OrderCreationResult;
+import com.example.sol_repo.models.OrderLine;
+import com.example.sol_repo.models.RecommendationItem;
+import com.example.sol_repo.models.RoomServiceOrder;
+import com.example.sol_repo.models.RoomType;
+import com.example.sol_repo.utils.RoomServiceCart;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/** Realtime Database backed replacement for the retired MockDatabaseDal (SQLite). */
+public class FirebaseDatabaseDal {
+    private static final long BOOKING_CODE_SEED = 1045L;
+    private static final long ORDER_CODE_SEED = 1045L;
+
+    private final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+    // ===================== Auth / Customer =====================
+
+    public void loginCustomer(String email, String password, FirebaseCallback<Customer> callback) {
+        String accountKey = sanitizeEmailKey(email);
+        readOnce(rootRef.child("accounts").child(accountKey), accountSnapshot -> {
+            if (!accountSnapshot.exists()
+                    || !password.equals(accountSnapshot.child("password").getValue(String.class))) {
+                callback.onSuccess(null);
+                return;
+            }
+            String customerId = accountSnapshot.child("customerId").getValue(String.class);
+            if (customerId == null) {
+                callback.onSuccess(null);
+                return;
+            }
+            fetchCustomer(customerId, callback::onSuccess, callback::onError);
+        }, callback::onError);
+    }
+
+    public void getCustomer(String customerId, FirebaseCallback<Customer> callback) {
+        fetchCustomer(customerId, callback::onSuccess, callback::onError);
+    }
+
+    private void fetchCustomer(String customerId, ValueListener<Customer> onValue, FailureListener onFailure) {
+        readOnce(rootRef.child("customers").child(customerId), snapshot ->
+                onValue.onValue(snapshot.exists() ? readCustomer(customerId, snapshot) : null), onFailure);
+    }
+
+    // ===================== Bookings =====================
+
+    public void getCurrentBooking(String customerId, FirebaseCallback<BookingSummary> callback) {
+        fetchBookingsForCustomer(customerId, bookings -> {
+            for (BookingSummary booking : bookings) {
+                if ("checked_in".equals(booking.getStatus())) {
+                    callback.onSuccess(booking);
+                    return;
+                }
+            }
+            for (BookingSummary booking : bookings) {
+                if ("confirmed".equals(booking.getStatus())) {
+                    callback.onSuccess(booking);
+                    return;
+                }
+            }
+            callback.onSuccess(null);
+        }, callback::onError);
+    }
+
+    public void getBookingForCustomer(String customerId, String bookingId, FirebaseCallback<BookingSummary> callback) {
+        readOnce(rootRef.child("bookings").child(bookingId), snapshot -> {
+            if (!snapshot.exists() || !customerId.equals(snapshot.child("customerId").getValue(String.class))) {
+                callback.onSuccess(null);
+                return;
+            }
+            callback.onSuccess(readBooking(bookingId, snapshot));
+        }, callback::onError);
+    }
+
+    public void getBookingsForCustomer(String customerId, FirebaseCallback<List<BookingSummary>> callback) {
+        fetchBookingsForCustomer(customerId, callback::onSuccess, callback::onError);
+    }
+
+    private void fetchBookingsForCustomer(String customerId, ValueListener<List<BookingSummary>> onValue,
+                                          FailureListener onFailure) {
+        readOnce(rootRef.child("bookingsByCustomer").child(customerId), indexSnapshot -> {
+            List<String> bookingIds = childKeys(indexSnapshot);
+            if (bookingIds.isEmpty()) {
+                onValue.onValue(new ArrayList<>());
+                return;
+            }
+
+            List<BookingSummary> bookings = new ArrayList<>();
+            AtomicCountdown countdown = new AtomicCountdown(bookingIds.size(), () -> {
+                bookings.sort(Comparator.comparing(BookingSummary::getCheckInDate));
+                onValue.onValue(bookings);
+            });
+
+            for (String bookingId : bookingIds) {
+                readOnce(rootRef.child("bookings").child(bookingId), snapshot -> {
+                    if (snapshot.exists()) {
+                        bookings.add(readBooking(bookingId, snapshot));
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, onFailure);
+    }
+
+    public void getRoomNumberForBooking(String bookingId, FirebaseCallback<String> callback) {
+        readOnce(rootRef.child("bookings").child(bookingId).child("roomNumber"), snapshot -> {
+            String roomNumber = snapshot.getValue(String.class);
+            callback.onSuccess(roomNumber == null ? "" : roomNumber);
+        }, callback::onError);
+    }
+
+    // ===================== Home dashboard =====================
+
+    public void getHomeServices(String bookingId, FirebaseCallback<List<HomeServiceItem>> callback) {
+        readOnce(rootRef.child("servicesByBooking").child(bookingId), indexSnapshot -> {
+            List<DataSnapshot> entries = new ArrayList<>();
+            for (DataSnapshot entry : indexSnapshot.getChildren()) {
+                entries.add(entry);
+                if (entries.size() >= 3) {
+                    break;
+                }
+            }
+            resolveHomeServicesSequentially(entries, 0, new ArrayList<>(), callback::onSuccess);
+        }, callback::onError);
+    }
+
+    private void resolveHomeServicesSequentially(List<DataSnapshot> entries, int index,
+                                                  List<HomeServiceItem> accumulated,
+                                                  ValueListener<List<HomeServiceItem>> onDone) {
+        if (index >= entries.size()) {
+            onDone.onValue(accumulated);
+            return;
+        }
+
+        DataSnapshot entry = entries.get(index);
+        String type = entry.child("type").getValue(String.class);
+        String refId = entry.child("refId").getValue(String.class);
+        Runnable next = () -> resolveHomeServicesSequentially(entries, index + 1, accumulated, onDone);
+
+        if ("transfer".equals(type)) {
+            readOnce(rootRef.child("transferBookings").child(refId), snapshot -> {
+                if (snapshot.exists()) {
+                    accumulated.add(new HomeServiceItem(
+                            "Airport Pickup",
+                            snapshot.child("scheduledDatetime").getValue(String.class),
+                            snapshot.child("status").getValue(String.class),
+                            "transfer"));
+                }
+                next.run();
+            }, error -> next.run());
+        } else if ("dining".equals(type)) {
+            readOnce(rootRef.child("diningReservations").child(refId), snapshot -> {
+                if (snapshot.exists()) {
+                    String venueType = snapshot.child("venueType").getValue(String.class);
+                    accumulated.add(new HomeServiceItem(
+                            formatVenueTitle(venueType),
+                            snapshot.child("reservationDate").getValue(String.class) + " "
+                                    + snapshot.child("reservationTime").getValue(String.class),
+                            snapshot.child("status").getValue(String.class),
+                            "restaurant"));
+                }
+                next.run();
+            }, error -> next.run());
+        } else if ("wellness".equals(type)) {
+            readOnce(rootRef.child("wellnessBookings").child(refId), snapshot -> {
+                if (!snapshot.exists()) {
+                    next.run();
+                    return;
+                }
+                String serviceId = snapshot.child("wellnessServiceId").getValue(String.class);
+                readOnce(rootRef.child("wellnessServices").child(serviceId), serviceSnapshot -> {
+                    accumulated.add(new HomeServiceItem(
+                            serviceSnapshot.child("serviceName").getValue(String.class),
+                            snapshot.child("scheduledDate").getValue(String.class) + " "
+                                    + snapshot.child("scheduledTime").getValue(String.class),
+                            snapshot.child("status").getValue(String.class),
+                            "wellness"));
+                    next.run();
+                }, error -> next.run());
+            }, error -> next.run());
+        } else {
+            next.run();
+        }
+    }
+
+    public void getRecommendations(FirebaseCallback<List<RecommendationItem>> callback) {
+        readOnce(rootRef.child("homeRecommendations"), snapshot -> {
+            List<RecommendationItem> recommendations = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                recommendations.add(new RecommendationItem(
+                        child.child("title").getValue(String.class),
+                        child.child("description").getValue(String.class),
+                        child.child("type").getValue(String.class)));
+                if (recommendations.size() >= 2) {
+                    break;
+                }
+            }
+            callback.onSuccess(recommendations);
+        }, callback::onError);
+    }
+
+    // ===================== Room booking flow =====================
+
+    public void getAvailableRoomTypes(String checkInDate, String checkOutDate,
+                                      FirebaseCallback<List<RoomType>> callback) {
+        fetchAvailableRoomTypes(checkInDate, checkOutDate, callback::onSuccess, callback::onError);
+    }
+
+    private void fetchAvailableRoomTypes(String checkInDate, String checkOutDate,
+                                         ValueListener<List<RoomType>> onValue, FailureListener onFailure) {
+        readOnce(rootRef.child("roomTypes"), roomTypesSnapshot ->
+                readOnce(rootRef.child("rooms"), roomsSnapshot ->
+                        readOnce(rootRef.child("roomCalendar"), calendarSnapshot -> {
+                            Map<String, Integer> availableCountByType = new HashMap<>();
+
+                            for (DataSnapshot roomSnapshot : roomsSnapshot.getChildren()) {
+                                String status = roomSnapshot.child("status").getValue(String.class);
+                                if ("maintenance".equals(status)) {
+                                    continue;
+                                }
+                                String roomTypeId = roomSnapshot.child("roomTypeId").getValue(String.class);
+                                String roomId = roomSnapshot.getKey();
+                                if (isRoomFree(calendarSnapshot.child(roomId), checkInDate, checkOutDate)) {
+                                    availableCountByType.merge(roomTypeId, 1, Integer::sum);
+                                }
+                            }
+
+                            List<RoomType> roomTypes = new ArrayList<>();
+                            for (DataSnapshot typeSnapshot : roomTypesSnapshot.getChildren()) {
+                                int availableRooms = availableCountByType.getOrDefault(typeSnapshot.getKey(), 0);
+                                if (availableRooms > 0) {
+                                    roomTypes.add(readRoomType(typeSnapshot, availableRooms));
+                                }
+                            }
+                            roomTypes.sort(Comparator.comparingDouble(RoomType::getBasePrice));
+                            onValue.onValue(roomTypes);
+                        }, onFailure), onFailure), onFailure);
+    }
+
+    public void getRoomType(String roomTypeId, String checkInDate, String checkOutDate,
+                            FirebaseCallback<RoomType> callback) {
+        fetchAvailableRoomTypes(checkInDate, checkOutDate, roomTypes -> {
+            for (RoomType roomType : roomTypes) {
+                if (roomType.getRoomTypeId().equals(roomTypeId)) {
+                    callback.onSuccess(roomType);
+                    return;
+                }
+            }
+            callback.onSuccess(null);
+        }, callback::onError);
+    }
+
+    public void createBooking(String customerId, String roomTypeId, String checkInDate, String checkOutDate,
+                              int numGuests, double totalPrice, double depositAmount, String paymentMethod,
+                              String fullName, String email, String phone, boolean updateProfile,
+                              FirebaseCallback<BookingCreationResult> callback) {
+        readOnce(rootRef.child("roomTypes").child(roomTypeId).child("typeName"), typeNameSnapshot -> {
+            String roomTypeName = typeNameSnapshot.getValue(String.class);
+            resolveAvailableRoom(roomTypeId, checkInDate, checkOutDate, room -> {
+                if (room == null) {
+                    callback.onSuccess(null);
+                    return;
+                }
+
+                nextSequence("booking", BOOKING_CODE_SEED, sequence -> {
+                    String bookingId = rootRef.child("bookings").push().getKey();
+                    String paymentId = rootRef.child("payments").push().getKey();
+                    String bookingCode = String.format(Locale.US, "BK-2026-%04d", sequence);
+                    String now = currentTimestamp();
+
+                    Map<String, Object> booking = new HashMap<>();
+                    booking.put("bookingCode", bookingCode);
+                    booking.put("customerId", customerId);
+                    booking.put("roomId", room.roomId);
+                    booking.put("roomTypeId", roomTypeId);
+                    booking.put("roomTypeName", roomTypeName);
+                    booking.put("roomNumber", room.roomNumber);
+                    booking.put("checkInDate", checkInDate);
+                    booking.put("checkOutDate", checkOutDate);
+                    booking.put("numGuests", numGuests);
+                    booking.put("totalPrice", totalPrice);
+                    booking.put("status", "confirmed");
+                    booking.put("createdAt", now);
+
+                    Map<String, Object> payment = new HashMap<>();
+                    payment.put("bookingId", bookingId);
+                    payment.put("customerId", customerId);
+                    payment.put("amount", depositAmount);
+                    payment.put("paymentMethod", paymentMethod);
+                    payment.put("paymentType", "deposit");
+                    payment.put("status", "success");
+                    payment.put("paidAt", now);
+                    payment.put("createdAt", now);
+
+                    Map<String, Object> calendarEntry = new HashMap<>();
+                    calendarEntry.put("checkIn", checkInDate);
+                    calendarEntry.put("checkOut", checkOutDate);
+                    calendarEntry.put("status", "confirmed");
+
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("/bookings/" + bookingId, booking);
+                    updates.put("/bookingsByCustomer/" + customerId + "/" + bookingId, true);
+                    updates.put("/roomCalendar/" + room.roomId + "/" + bookingId, calendarEntry);
+                    updates.put("/payments/" + paymentId, payment);
+                    updates.put("/paymentsByBooking/" + bookingId + "/" + paymentId, true);
+                    updates.put("/customers/" + customerId + "/status", "in_stay");
+                    if (updateProfile) {
+                        updates.put("/customers/" + customerId + "/fullName", fullName);
+                        updates.put("/customers/" + customerId + "/email", email);
+                        updates.put("/customers/" + customerId + "/phone", phone);
+                    }
+
+                    rootRef.updateChildren(updates, (error, ref) -> {
+                        if (error != null) {
+                            callback.onError(error.getMessage());
+                        } else {
+                            callback.onSuccess(new BookingCreationResult(bookingId, bookingCode));
+                        }
+                    });
+                }, callback::onError);
+            }, callback::onError);
+        }, callback::onError);
+    }
+
+    // ===================== Room service =====================
+
+    public void getMenuItems(FirebaseCallback<List<MenuItem>> callback) {
+        readOnce(rootRef.child("menuItems"), snapshot -> {
+            List<MenuItem> items = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                Boolean available = child.child("isAvailable").getValue(Boolean.class);
+                if (available == null || !available) {
+                    continue;
+                }
+                items.add(new MenuItem(
+                        child.getKey(),
+                        child.child("itemName").getValue(String.class),
+                        child.child("category").getValue(String.class),
+                        valueOrZero(child.child("price")),
+                        child.child("description").getValue(String.class),
+                        child.child("imageUrl").getValue(String.class)));
+            }
+            callback.onSuccess(items);
+        }, callback::onError);
+    }
+
+    public void getActiveRoomServiceOrder(String bookingId, FirebaseCallback<RoomServiceOrder> callback) {
+        readOnce(rootRef.child("ordersByBooking").child(bookingId), indexSnapshot -> {
+            List<String> orderIds = childKeys(indexSnapshot);
+            if (orderIds.isEmpty()) {
+                callback.onSuccess(null);
+                return;
+            }
+
+            List<RoomServiceOrder> candidates = new ArrayList<>();
+            AtomicCountdown countdown = new AtomicCountdown(orderIds.size(), () -> {
+                RoomServiceOrder latest = null;
+                for (RoomServiceOrder order : candidates) {
+                    if ("delivered".equals(order.getStatus()) || "cancelled".equals(order.getStatus())) {
+                        continue;
+                    }
+                    if (latest == null || order.getOrderedAt().compareTo(latest.getOrderedAt()) > 0) {
+                        latest = order;
+                    }
+                }
+                callback.onSuccess(latest);
+            });
+
+            for (String orderId : orderIds) {
+                readOnce(rootRef.child("roomServiceOrders").child(orderId), snapshot -> {
+                    if (snapshot.exists()) {
+                        candidates.add(readRoomServiceOrder(orderId, snapshot));
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, callback::onError);
+    }
+
+    public void getRoomServiceOrder(String orderId, FirebaseCallback<RoomServiceOrder> callback) {
+        readOnce(rootRef.child("roomServiceOrders").child(orderId), snapshot -> {
+            callback.onSuccess(snapshot.exists() ? readRoomServiceOrder(orderId, snapshot) : null);
+        }, callback::onError);
+    }
+
+    public void getRoomServiceOrderLines(String orderId, FirebaseCallback<List<OrderLine>> callback) {
+        readOnce(rootRef.child("roomServiceOrders").child(orderId).child("items"), snapshot -> {
+            List<OrderLine> lines = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                lines.add(new OrderLine(
+                        child.child("itemName").getValue(String.class),
+                        child.child("imageUrl").getValue(String.class),
+                        valueOrZeroInt(child.child("quantity")),
+                        valueOrZero(child.child("unitPrice"))));
+            }
+            callback.onSuccess(lines);
+        }, callback::onError);
+    }
+
+    public void createRoomServiceOrder(String bookingId, String customerId, List<RoomServiceCart.Entry> lines,
+                                       String kitchenNote, double subtotal,
+                                       double serviceCharge, double totalAmount, String paymentMethod,
+                                       FirebaseCallback<OrderCreationResult> callback) {
+        nextSequence("roomServiceOrder", ORDER_CODE_SEED, sequence -> {
+            String orderId = rootRef.child("roomServiceOrders").push().getKey();
+            String paymentId = rootRef.child("payments").push().getKey();
+            String orderCode = String.format(Locale.US, "RS-2026-%04d", sequence);
+            String now = currentTimestamp();
+
+            Map<String, Object> items = new HashMap<>();
+            for (RoomServiceCart.Entry entry : lines) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("itemName", entry.item.getItemName());
+                item.put("imageUrl", entry.item.getImageUrl());
+                item.put("quantity", entry.quantity);
+                item.put("unitPrice", entry.item.getPrice());
+                items.put(entry.item.getMenuItemId(), item);
+            }
+
+            Map<String, Object> order = new HashMap<>();
+            order.put("orderCode", orderCode);
+            order.put("bookingId", bookingId);
+            order.put("customerId", customerId);
+            order.put("items", items);
+            order.put("kitchenNote", kitchenNote);
+            order.put("subtotal", subtotal);
+            order.put("serviceCharge", serviceCharge);
+            order.put("totalAmount", totalAmount);
+            order.put("paymentMethod", paymentMethod);
+            order.put("status", "preparing");
+            order.put("orderedAt", now);
+
+            Map<String, Object> payment = new HashMap<>();
+            payment.put("bookingId", bookingId);
+            payment.put("customerId", customerId);
+            payment.put("amount", totalAmount);
+            payment.put("paymentMethod", paymentMethod);
+            payment.put("paymentType", "service");
+            payment.put("status", "success");
+            payment.put("paidAt", now);
+            payment.put("createdAt", now);
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("/roomServiceOrders/" + orderId, order);
+            updates.put("/ordersByBooking/" + bookingId + "/" + orderId, true);
+            updates.put("/payments/" + paymentId, payment);
+            updates.put("/paymentsByBooking/" + bookingId + "/" + paymentId, true);
+
+            rootRef.updateChildren(updates, (error, ref) -> {
+                if (error != null) {
+                    callback.onError(error.getMessage());
+                } else {
+                    callback.onSuccess(new OrderCreationResult(orderId, orderCode));
+                }
+            });
+        }, callback::onError);
+    }
+
+    public void getLatestServicePaymentMethod(String bookingId, FirebaseCallback<String> callback) {
+        readOnce(rootRef.child("paymentsByBooking").child(bookingId), indexSnapshot -> {
+            List<String> paymentIds = childKeys(indexSnapshot);
+            if (paymentIds.isEmpty()) {
+                callback.onSuccess("room_bill");
+                return;
+            }
+
+            List<DataSnapshot> payments = new ArrayList<>();
+            AtomicCountdown countdown = new AtomicCountdown(paymentIds.size(), () -> {
+                String latestMethod = "room_bill";
+                String latestCreatedAt = "";
+                for (DataSnapshot payment : payments) {
+                    if (!"service".equals(payment.child("paymentType").getValue(String.class))) {
+                        continue;
+                    }
+                    String createdAt = payment.child("createdAt").getValue(String.class);
+                    if (createdAt != null && createdAt.compareTo(latestCreatedAt) > 0) {
+                        latestCreatedAt = createdAt;
+                        latestMethod = payment.child("paymentMethod").getValue(String.class);
+                    }
+                }
+                callback.onSuccess(latestMethod);
+            });
+
+            for (String paymentId : paymentIds) {
+                readOnce(rootRef.child("payments").child(paymentId), snapshot -> {
+                    if (snapshot.exists()) {
+                        payments.add(snapshot);
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, callback::onError);
+    }
+
+    // ===================== Internal chaining helpers =====================
+
+    private interface ValueListener<T> {
+        void onValue(T value);
+    }
+
+    private interface FailureListener {
+        void onFailure(String message);
+    }
+
+    private static class RoomInfo {
+        final String roomId;
+        final String roomNumber;
+
+        RoomInfo(String roomId, String roomNumber) {
+            this.roomId = roomId;
+            this.roomNumber = roomNumber;
+        }
+    }
+
+    private void resolveAvailableRoom(String roomTypeId, String checkInDate, String checkOutDate,
+                                      ValueListener<RoomInfo> onValue, FailureListener onFailure) {
+        readOnce(rootRef.child("rooms"), roomsSnapshot ->
+                readOnce(rootRef.child("roomCalendar"), calendarSnapshot -> {
+                    for (DataSnapshot roomSnapshot : roomsSnapshot.getChildren()) {
+                        if (!roomTypeId.equals(roomSnapshot.child("roomTypeId").getValue(String.class))) {
+                            continue;
+                        }
+                        if ("maintenance".equals(roomSnapshot.child("status").getValue(String.class))) {
+                            continue;
+                        }
+                        String roomId = roomSnapshot.getKey();
+                        if (isRoomFree(calendarSnapshot.child(roomId), checkInDate, checkOutDate)) {
+                            onValue.onValue(new RoomInfo(roomId,
+                                    roomSnapshot.child("roomNumber").getValue(String.class)));
+                            return;
+                        }
+                    }
+                    onValue.onValue(null);
+                }, onFailure), onFailure);
+    }
+
+    private boolean isRoomFree(DataSnapshot roomBookingsSnapshot, String checkInDate, String checkOutDate) {
+        for (DataSnapshot existingBooking : roomBookingsSnapshot.getChildren()) {
+            String status = existingBooking.child("status").getValue(String.class);
+            if (!"pending".equals(status) && !"confirmed".equals(status) && !"checked_in".equals(status)) {
+                continue;
+            }
+            String existingCheckIn = existingBooking.child("checkIn").getValue(String.class);
+            String existingCheckOut = existingBooking.child("checkOut").getValue(String.class);
+            boolean overlaps = existingCheckIn.compareTo(checkOutDate) < 0
+                    && existingCheckOut.compareTo(checkInDate) > 0;
+            if (overlaps) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void nextSequence(String counterName, long seed, ValueListener<Long> onValue, FailureListener onFailure) {
+        rootRef.child("meta").child("counters").child(counterName)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData currentData) {
+                        Long current = currentData.getValue(Long.class);
+                        currentData.setValue((current == null ? seed : current) + 1);
+                        return Transaction.success(currentData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError error, boolean committed, DataSnapshot snapshot) {
+                        if (error != null) {
+                            onFailure.onFailure(error.getMessage());
+                        } else if (!committed || snapshot == null) {
+                            onFailure.onFailure("Could not generate a sequence number");
+                        } else {
+                            onValue.onValue(snapshot.getValue(Long.class));
+                        }
+                    }
+                });
+    }
+
+    private Customer readCustomer(String customerId, DataSnapshot snapshot) {
+        Customer customer = new Customer(
+                customerId,
+                snapshot.child("fullName").getValue(String.class),
+                snapshot.child("email").getValue(String.class),
+                snapshot.child("phone").getValue(String.class),
+                snapshot.child("status").getValue(String.class),
+                snapshot.child("createdAt").getValue(String.class));
+        customer.setDob(snapshot.child("dob").getValue(String.class));
+        customer.setNationality(snapshot.child("nationality").getValue(String.class));
+        customer.setLanguage(snapshot.child("language").getValue(String.class));
+        customer.setAvatarUrl(snapshot.child("avatarUrl").getValue(String.class));
+        customer.setMembershipTier(snapshot.child("membershipTier").getValue(String.class));
+        return customer;
+    }
+
+    private BookingSummary readBooking(String bookingId, DataSnapshot snapshot) {
+        return new BookingSummary(
+                bookingId,
+                snapshot.child("bookingCode").getValue(String.class),
+                snapshot.child("roomTypeName").getValue(String.class),
+                snapshot.child("checkInDate").getValue(String.class),
+                snapshot.child("checkOutDate").getValue(String.class),
+                valueOrZeroInt(snapshot.child("numGuests")),
+                snapshot.child("status").getValue(String.class));
+    }
+
+    private RoomType readRoomType(DataSnapshot snapshot, int availableRooms) {
+        return new RoomType(
+                snapshot.getKey(),
+                snapshot.child("typeName").getValue(String.class),
+                snapshot.child("description").getValue(String.class),
+                valueOrZero(snapshot.child("basePrice")),
+                valueOrZeroInt(snapshot.child("maxOccupancy")),
+                snapshot.child("category").getValue(String.class),
+                snapshot.child("viewType").getValue(String.class),
+                valueOrZeroInt(snapshot.child("sizeSqft")),
+                snapshot.child("bedType").getValue(String.class),
+                snapshot.child("amenities").getValue(String.class),
+                snapshot.child("imageUrl").getValue(String.class),
+                availableRooms);
+    }
+
+    private RoomServiceOrder readRoomServiceOrder(String orderId, DataSnapshot snapshot) {
+        int itemCount = 0;
+        for (DataSnapshot item : snapshot.child("items").getChildren()) {
+            itemCount += valueOrZeroInt(item.child("quantity"));
+        }
+        return new RoomServiceOrder(
+                orderId,
+                snapshot.child("orderCode").getValue(String.class),
+                snapshot.child("bookingId").getValue(String.class),
+                valueOrZero(snapshot.child("totalAmount")),
+                snapshot.child("status").getValue(String.class),
+                snapshot.child("orderedAt").getValue(String.class),
+                itemCount);
+    }
+
+    private String formatVenueTitle(String venueType) {
+        if ("coffee".equals(venueType)) {
+            return "Coffee Table";
+        }
+        if ("bar".equals(venueType)) {
+            return "Bar Table";
+        }
+        return "Restaurant Table";
+    }
+
+    private List<String> childKeys(DataSnapshot snapshot) {
+        List<String> keys = new ArrayList<>();
+        for (DataSnapshot child : snapshot.getChildren()) {
+            keys.add(child.getKey());
+        }
+        return keys;
+    }
+
+    private double valueOrZero(DataSnapshot snapshot) {
+        Double value = snapshot.getValue(Double.class);
+        return value == null ? 0 : value;
+    }
+
+    private int valueOrZeroInt(DataSnapshot snapshot) {
+        Long value = snapshot.getValue(Long.class);
+        return value == null ? 0 : value.intValue();
+    }
+
+    private String sanitizeEmailKey(String email) {
+        return email.trim().toLowerCase(Locale.US).replace(".", ",");
+    }
+
+    private String currentTimestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new java.util.Date());
+    }
+
+    private void readOnce(DatabaseReference ref, ValueListener<DataSnapshot> onValue, FailureListener onFailure) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                onValue.onValue(snapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                onFailure.onFailure(error.getMessage());
+            }
+        });
+    }
+
+    /** Fires {@code onDone} exactly once, after {@code count} ticks have been recorded. */
+    private static class AtomicCountdown {
+        private int remaining;
+        private final Runnable onDone;
+
+        AtomicCountdown(int count, Runnable onDone) {
+            this.remaining = count;
+            this.onDone = onDone;
+            if (count <= 0) {
+                onDone.run();
+            }
+        }
+
+        void tick() {
+            remaining--;
+            if (remaining == 0) {
+                onDone.run();
+            }
+        }
+    }
+}

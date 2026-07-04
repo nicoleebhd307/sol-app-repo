@@ -28,19 +28,6 @@
             android:paddingEnd="20dp"
             android:paddingBottom="14dp">
 
-            <TextView
-                android:id="@+id/txtHomeWelcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:fontFamily="@font/cormorant_garamond"
-                android:gravity="start"
-                android:textAlignment="viewStart"
-                android:textColor="@color/sol_text_primary"
-                android:textSize="34sp"
-                android:textStyle="bold"
-                tools:text="Welcome, Emma" />
-
             <LinearLayout
                 android:id="@+id/bookingCard"
                 android:layout_width="match_parent"
@@ -280,7 +267,7 @@
                         android:fontFamily="@font/inter"
                         android:text="@string/home_my_services"
                         android:textColor="@color/sol_text_primary"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -316,7 +303,7 @@
                     android:fontFamily="@font/inter"
                     android:text="@string/home_quick_access"
                     android:textColor="@color/sol_text_primary"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -326,7 +313,9 @@
                     android:orientation="horizontal">
 
                     <include layout="@layout/view_quick_restaurant" />
-                    <include layout="@layout/view_quick_roomservice" />
+                    <include
+                        android:id="@+id/quickRoomService"
+                        layout="@layout/view_quick_roomservice" />
                     <include layout="@layout/view_quick_wellness" />
                     <include layout="@layout/view_quick_transfer" />
                 </LinearLayout>
@@ -353,7 +342,7 @@
                         android:fontFamily="@font/inter"
                         android:text="@string/home_recommended"
                         android:textColor="@color/sol_text_primary"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView

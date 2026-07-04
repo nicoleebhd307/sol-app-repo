@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="@android:color/transparent" android:pathData="M6,5H18C19.1,5 20,5.9 20,7V18C20,19.1 19.1,20 18,20H6C4.9,20 4,19.1 4,18V7C4,5.9 4.9,5 6,5Z" android:strokeColor="@color/sol_gold_dark" android:strokeLineCap="round" android:strokeLineJoin="round" android:strokeWidth="1.8" />
+    <path android:fillColor="@android:color/transparent" android:pathData="M8,3V7" android:strokeColor="@color/sol_gold_dark" android:strokeLineCap="round" android:strokeWidth="1.8" />
+    <path android:fillColor="@android:color/transparent" android:pathData="M16,3V7" android:strokeColor="@color/sol_gold_dark" android:strokeLineCap="round" android:strokeWidth="1.8" />
+    <path android:fillColor="@android:color/transparent" android:pathData="M4,10H20" android:strokeColor="@color/sol_gold_dark" android:strokeLineCap="round" android:strokeWidth="1.8" />
+    <path android:fillColor="@color/sol_gold_dark" android:pathData="M8,13.5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path android:fillColor="@color/sol_gold_dark" android:pathData="M12,13.5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path android:fillColor="@color/sol_gold_dark" android:pathData="M16,13.5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+</vector>
