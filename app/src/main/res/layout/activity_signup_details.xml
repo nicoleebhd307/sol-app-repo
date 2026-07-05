@@ -17,51 +17,37 @@
         android:paddingEnd="24dp"
         android:paddingBottom="24dp">
 
-        <FrameLayout
-            android:id="@+id/btnDetailsBack"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_circle_white"
-            android:contentDescription="@string/signup_back"
-            android:elevation="2dp">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_arrowleft" />
-        </FrameLayout>
-
-        <ImageView
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp"
-            android:contentDescription="@string/logo_content_description"
-            android:src="@drawable/sol_logo"
-            app:tint="@color/sol_gold_dark" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/cormorant_garamond"
-            android:gravity="center"
-            android:text="@string/details_title"
-            android:textColor="@color/sol_text_primary"
-            android:textSize="34sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:fontFamily="@font/inter"
-            android:gravity="center"
-            android:text="@string/details_subtitle"
-            android:textColor="@color/sol_text_secondary"
-            android:textSize="14sp" />
+            <FrameLayout
+                android:id="@+id/btnDetailsBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:contentDescription="@string/signup_back">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_arrowleft" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/details_title"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <!-- Phone -->
         <LinearLayout
@@ -251,8 +237,12 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
+                android:drawableStart="@drawable/ic_flag_vi"
+                android:drawablePadding="8dp"
                 android:fontFamily="@font/plus_jakarta_sans"
                 android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:text="@string/details_language_vi"
                 android:textSize="14sp" />
 
@@ -262,8 +252,12 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:drawableStart="@drawable/ic_flag_en"
+                android:drawablePadding="8dp"
                 android:fontFamily="@font/plus_jakarta_sans"
                 android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:text="@string/details_language_en"
                 android:textSize="14sp" />
         </LinearLayout>

@@ -11,7 +11,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@string/account_birthday"
-        android:src="@drawable/ic_cake" />
+        android:src="@drawable/ic_cake"
+        android:tint="@color/sol_gold_dark" />
 
     <LinearLayout
         android:layout_width="0dp"

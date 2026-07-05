@@ -9,6 +9,32 @@
 
     <style name="Theme.Solrepo" parent="Base.Theme.Solrepo" />
 
+    <style name="AllServiceItem">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:background">@drawable/bg_quick_access</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="AllServiceLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/sol_text_primary</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
     <style name="FilterChip">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">40dp</item>

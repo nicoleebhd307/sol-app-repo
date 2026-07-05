@@ -18,6 +18,7 @@ import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.Customer;
 import com.example.sol_repo.utils.BottomNavHelper;
 import com.example.sol_repo.utils.ImageLoader;
+import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
@@ -77,11 +78,8 @@ public class AccountActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.txtAccountStatus)).setText(formatCustomerStatus(customer.getStatus()));
             ((TextView) findViewById(R.id.txtAccountMemberId)).setText(
                     getString(R.string.account_member_id_value, extractMemberNumber(customer.getCustomerId())));
-            ((TextView) findViewById(R.id.txtAccountEmail)).setText(customer.getEmail());
             ((TextView) findViewById(R.id.txtAccountPhone)).setText(customer.getPhone());
             ((TextView) findViewById(R.id.txtAccountMemberSince)).setText(formatMemberSince(customer.getCreatedAt()));
-            ((TextView) findViewById(R.id.txtAccountNationality)).setText(
-                    valueOrDefault(customer.getNationality(), getString(R.string.account_nationality_default)));
             ((TextView) findViewById(R.id.txtAccountBirthday)).setText(formatBirthday(customer.getDob()));
             ((TextView) findViewById(R.id.txtAccountLanguage)).setText(formatLanguage(customer.getLanguage()));
 
@@ -178,9 +176,11 @@ public class AccountActivity extends AppCompatActivity {
         itemView.findViewById(R.id.txtSessionBadge)
                 .setVisibility(selectedSession ? View.VISIBLE : View.GONE);
 
+        ImageView bookingImage = itemView.findViewById(R.id.imgAccountBookingRoom);
+        int bookingPlaceholder = RoomAssets.roomImageForName(booking.getRoomTypeName());
+        firebaseDatabaseDal.getRoomTypeImageUrl(booking.getRoomTypeId(), imageUrl ->
+                ImageLoader.load(bookingImage, imageUrl, bookingPlaceholder));
         ((TextView) itemView.findViewById(R.id.txtAccountBookingRoom)).setText(booking.getRoomTypeName());
-        ((TextView) itemView.findViewById(R.id.txtAccountBookingCode)).setText(
-                getString(R.string.booking_id_label, booking.getBookingCode()));
         ((TextView) itemView.findViewById(R.id.txtAccountBookingDates)).setText(formatDateRange(booking));
         ((TextView) itemView.findViewById(R.id.txtAccountBookingGuests)).setText(
                 getString(R.string.home_guest_count, booking.getNumGuests()));

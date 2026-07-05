@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -68,15 +67,17 @@ public class RoomServiceTrackingActivity extends AppCompatActivity {
             });
         });
 
-        findViewById(R.id.btnTrackingBack).setOnClickListener(view -> finish());
-        findViewById(R.id.btnCallService).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btnMessageDesk).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btnViewFullDetails).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btnViewOrderDetails).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
+        // Sub-page: no bottom nav. Back always returns to the main room service page.
+        findViewById(R.id.btnTrackingBack).setOnClickListener(view -> backToRoomService(bookingId));
+    }
+
+    private void backToRoomService(String bookingId) {
+        android.content.Intent intent = new android.content.Intent(this, RoomServiceActivity.class);
+        intent.putExtra(RoomServiceActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     private void bindScreen(BookingSummary booking, RoomServiceOrder order, boolean showSuccess) {
@@ -90,6 +91,10 @@ public class RoomServiceTrackingActivity extends AppCompatActivity {
     }
 
     private void bindBookingCard(BookingSummary booking, RoomServiceOrder order) {
+        ImageView roomImage = findViewById(R.id.imgTrackingRoom);
+        int placeholder = RoomAssets.roomImageForName(booking.getRoomTypeName());
+        firebaseDatabaseDal.getRoomTypeImageUrl(booking.getRoomTypeId(), imageUrl ->
+                ImageLoader.load(roomImage, imageUrl, placeholder));
         ((TextView) findViewById(R.id.txtTrackingRoomType)).setText(
                 booking.getRoomTypeName().toUpperCase(Locale.US));
         firebaseDatabaseDal.getRoomNumberForBooking(booking.getBookingId(), roomNumber ->

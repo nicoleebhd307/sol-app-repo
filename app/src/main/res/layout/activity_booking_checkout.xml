@@ -17,15 +17,16 @@
         android:paddingEnd="20dp"
         android:paddingBottom="24dp">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <FrameLayout
                 android:id="@+id/btnCheckoutBack"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:layout_gravity="start|center_vertical"
                 android:contentDescription="@string/detail_back">
 
                 <ImageView
@@ -36,50 +37,17 @@
                     android:src="@drawable/ic_arrowleft" />
             </FrameLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:contentDescription="@string/logo_content_description"
-                    android:src="@drawable/sol_logo" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:letterSpacing="0.25"
-                    android:text="@string/brand_name"
-                    android:textColor="@color/sol_text_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:fontFamily="@font/cormorant_garamond"
-            android:text="@string/checkout_title"
-            android:textColor="@color/sol_text_primary"
-            android:textSize="36sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/inter"
-            android:text="@string/checkout_subtitle"
-            android:textColor="@color/sol_text_secondary"
-            android:textSize="14sp" />
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/checkout_title"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -418,52 +386,6 @@
                 android:textColorHint="@color/sol_text_secondary"
                 android:textSize="14sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:background="@color/sol_border" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/checkout_save_profile"
-                        android:textColor="@color/sol_text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/checkout_save_profile_hint"
-                        android:textColor="@color/sol_text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switchSaveProfile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    app:thumbTint="@color/white"
-                    app:trackTint="@color/sol_gold" />
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

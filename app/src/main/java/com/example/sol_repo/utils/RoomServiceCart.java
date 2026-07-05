@@ -23,7 +23,7 @@ public final class RoomServiceCart {
 
     private static final Map<String, Entry> entries = new LinkedHashMap<>();
     private static String kitchenNote = "";
-    private static String paymentMethod = "room_bill";
+    private static String paymentMethod = "bank_card";
     private static String bookingId = null;
 
     private RoomServiceCart() {
@@ -109,7 +109,7 @@ public final class RoomServiceCart {
     public static void clear() {
         entries.clear();
         kitchenNote = "";
-        paymentMethod = "room_bill";
+        paymentMethod = "bank_card";
         bookingId = null;
     }
 }

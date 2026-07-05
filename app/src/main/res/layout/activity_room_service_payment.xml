@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,51 +27,37 @@
             android:paddingEnd="16dp"
             android:paddingBottom="20dp">
 
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <FrameLayout
                     android:id="@+id/btnPaymentBack"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:layout_gravity="start|top"
                     android:contentDescription="@string/detail_back">
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_arrowleft" />
                 </FrameLayout>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/cormorant_garamond"
-                        android:text="@string/rs_payment_title"
-                        android:textColor="@color/sol_text_primary"
-                        android:textSize="30sp"
-                        android:textStyle="bold|italic" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/inter"
-                        android:text="@string/rs_payment_subtitle"
-                        android:textColor="@color/sol_text_secondary"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </FrameLayout>
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/cormorant_garamond"
+                    android:text="@string/rs_payment_title"
+                    android:textColor="@color/sol_text_primary"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <include
                 android:id="@+id/cardPaymentBooking"
@@ -98,70 +84,55 @@
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
+                <!-- Collapsed selector: tap to expand the list of payment methods. -->
                 <LinearLayout
-                    android:id="@+id/rowMethodRoomBill"
+                    android:id="@+id/paymentMethodSelector"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_input"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:padding="14dp">
 
                     <ImageView
+                        android:id="@+id/imgSelectedMethod"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_card" />
+                        android:src="@drawable/ic_card"
+                        android:tint="@color/sol_gold_dark" />
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/txtSelectedMethod"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/sol_text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Bank Card" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="@string/rs_pay_room_bill"
-                            android:textColor="@color/sol_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="@string/rs_pay_room_bill_hint"
-                            android:textColor="@color/sol_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <FrameLayout
-                        android:id="@+id/radioRoomBill"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:background="@drawable/bg_circle_gold">
-
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_check"
-                            android:tint="@color/white"
-                            tools:ignore="UseAppTint" />
-                    </FrameLayout>
+                    <ImageView
+                        android:id="@+id/imgMethodChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_chevrondown"
+                        android:tint="@color/sol_text_secondary" />
                 </LinearLayout>
 
-                <View
+                <LinearLayout
+                    android:id="@+id/paymentMethodOptions"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:background="@color/sol_border" />
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/rowMethodBankCard"
@@ -287,6 +258,7 @@
                             android:visibility="gone"
                             tools:ignore="UseAppTint" />
                     </FrameLayout>
+                </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -533,91 +505,10 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_dashboard_card"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/rowPromoCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/rs_promo_code"
-                        android:textColor="@color/sol_text_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/rs_promo_add"
-                        android:textColor="@color/sol_text_secondary"
-                        android:textSize="12sp" />
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_chevronright" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/sol_border" />
-
-                <LinearLayout
-                    android:id="@+id/rowSpecialRequest"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/rs_special_request"
-                        android:textColor="@color/sol_text_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:text="@string/rs_special_add"
-                        android:textColor="@color/sol_text_secondary"
-                        android:textSize="12sp" />
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_chevronright" />
-                </LinearLayout>
-            </LinearLayout>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:fontFamily="@font/plus_jakarta_sans"
                 android:gravity="center"
                 android:text="@string/rs_secure_payment"
@@ -639,13 +530,4 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
-
-    <include
-        android:id="@+id/bottomNavigation"
-        layout="@layout/layout_bottom_navigation"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

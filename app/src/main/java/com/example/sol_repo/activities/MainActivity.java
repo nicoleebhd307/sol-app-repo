@@ -2,6 +2,7 @@ package com.example.sol_repo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,8 @@ import com.example.sol_repo.adapters.RecommendationAdapter;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.utils.BottomNavHelper;
+import com.example.sol_repo.utils.ImageLoader;
+import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
@@ -62,12 +65,22 @@ public class MainActivity extends AppCompatActivity {
     private void bindBooking(BookingSummary bookingSummary) {
         ((TextView) findViewById(R.id.txtRoomType)).setText(
                 bookingSummary.getRoomTypeName().toUpperCase(Locale.US));
+        android.widget.ImageView roomImage = findViewById(R.id.imgHomeRoom);
+        int roomPlaceholder = RoomAssets.roomImageForName(bookingSummary.getRoomTypeName());
+        firebaseDatabaseDal.getRoomTypeImageUrl(bookingSummary.getRoomTypeId(), imageUrl ->
+                ImageLoader.load(roomImage, imageUrl, roomPlaceholder));
         ((TextView) findViewById(R.id.txtBookingCode)).setText(bookingSummary.getBookingCode());
         ((TextView) findViewById(R.id.txtCheckIn)).setText(formatDate(bookingSummary.getCheckInDate()));
         ((TextView) findViewById(R.id.txtCheckOut)).setText(formatDate(bookingSummary.getCheckOutDate()));
         ((TextView) findViewById(R.id.txtGuests)).setText(
                 getString(R.string.home_guest_count, bookingSummary.getNumGuests()));
-        ((TextView) findViewById(R.id.txtBookingStatus)).setText(formatStatus(bookingSummary.getStatus()));
+
+        // Status field now shows the assigned room number for this booking.
+        TextView roomNumberView = findViewById(R.id.txtBookingStatus);
+        firebaseDatabaseDal.getRoomNumberForBooking(bookingSummary.getBookingId(), roomNumber ->
+                roomNumberView.setText(roomNumber == null || roomNumber.isEmpty()
+                        ? getString(R.string.account_unknown_value)
+                        : roomNumber));
 
         LinearLayout servicesContainer = findViewById(R.id.listHomeServices);
         LinearLayout recommendationsContainer = findViewById(R.id.listRecommendations);
@@ -83,6 +96,15 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(RoomServiceActivity.EXTRA_BOOKING_ID, activeBookingId);
             startActivity(intent);
         });
+
+        // Remaining services are not yet available in this build.
+        View.OnClickListener comingSoon = view ->
+                Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
+        findViewById(R.id.quickRestaurant).setOnClickListener(comingSoon);
+        findViewById(R.id.quickSpa).setOnClickListener(comingSoon);
+        findViewById(R.id.quickTransport).setOnClickListener(comingSoon);
+        findViewById(R.id.quickSouvenir).setOnClickListener(comingSoon);
+        findViewById(R.id.quickMore).setOnClickListener(comingSoon);
     }
 
     private String extractFirstName(String fullName) {

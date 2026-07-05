@@ -12,7 +12,7 @@
     <ImageView
         android:id="@+id/imgNavServices"
         android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/nav_services"
         android:src="@drawable/ic_service" />
 

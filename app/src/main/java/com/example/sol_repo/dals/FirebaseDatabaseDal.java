@@ -469,10 +469,49 @@ public class FirebaseDatabaseDal {
         }, callback::onError);
     }
 
+    /** Returns every room service order for a booking, newest first. */
+    public void getRoomServiceOrders(String bookingId, FirebaseCallback<List<RoomServiceOrder>> callback) {
+        readOnce(rootRef.child("ordersByBooking").child(bookingId), indexSnapshot -> {
+            List<String> orderIds = childKeys(indexSnapshot);
+            if (orderIds.isEmpty()) {
+                callback.onSuccess(new ArrayList<>());
+                return;
+            }
+
+            List<RoomServiceOrder> orders = new ArrayList<>();
+            AtomicCountdown countdown = new AtomicCountdown(orderIds.size(), () -> {
+                orders.sort((a, b) -> b.getOrderedAt().compareTo(a.getOrderedAt()));
+                callback.onSuccess(orders);
+            });
+
+            for (String orderId : orderIds) {
+                readOnce(rootRef.child("roomServiceOrders").child(orderId), snapshot -> {
+                    if (snapshot.exists()) {
+                        orders.add(readRoomServiceOrder(orderId, snapshot));
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, callback::onError);
+    }
+
     public void getRoomServiceOrder(String orderId, FirebaseCallback<RoomServiceOrder> callback) {
         readOnce(rootRef.child("roomServiceOrders").child(orderId), snapshot -> {
             callback.onSuccess(snapshot.exists() ? readRoomServiceOrder(orderId, snapshot) : null);
         }, callback::onError);
+    }
+
+    /** Advances a single order to a new lifecycle status (preparing → on_the_way → delivered). */
+    public void updateRoomServiceOrderStatus(String orderId, String status,
+                                             FirebaseCallback<Boolean> callback) {
+        rootRef.child("roomServiceOrders").child(orderId).child("status").setValue(status,
+                (error, ref) -> {
+                    if (error != null) {
+                        callback.onError(error.getMessage());
+                    } else {
+                        callback.onSuccess(true);
+                    }
+                });
     }
 
     public void getRoomServiceOrderLines(String orderId, FirebaseCallback<List<OrderLine>> callback) {
@@ -683,7 +722,7 @@ public class FirebaseDatabaseDal {
     }
 
     private BookingSummary readBooking(String bookingId, DataSnapshot snapshot) {
-        return new BookingSummary(
+        BookingSummary summary = new BookingSummary(
                 bookingId,
                 snapshot.child("bookingCode").getValue(String.class),
                 snapshot.child("roomTypeName").getValue(String.class),
@@ -691,6 +730,19 @@ public class FirebaseDatabaseDal {
                 snapshot.child("checkOutDate").getValue(String.class),
                 valueOrZeroInt(snapshot.child("numGuests")),
                 snapshot.child("status").getValue(String.class));
+        summary.setRoomTypeId(snapshot.child("roomTypeId").getValue(String.class));
+        return summary;
+    }
+
+    /** Reads a room type's photo URL so booking thumbnails can show the real room image. */
+    public void getRoomTypeImageUrl(String roomTypeId, FirebaseCallback<String> callback) {
+        if (roomTypeId == null) {
+            callback.onSuccess(null);
+            return;
+        }
+        readOnce(rootRef.child("roomTypes").child(roomTypeId).child("imageUrl"),
+                snapshot -> callback.onSuccess(snapshot.getValue(String.class)),
+                callback::onError);
     }
 
     private RoomType readRoomType(DataSnapshot snapshot, int availableRooms) {

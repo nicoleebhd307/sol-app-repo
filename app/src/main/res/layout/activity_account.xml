@@ -153,20 +153,44 @@
                     android:layout_marginTop="16dp"
                     android:background="@color/sol_border" />
 
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:columnCount="2"
-                    android:rowCount="3">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <include layout="@layout/view_account_fact_email" />
-                    <include layout="@layout/view_account_fact_member_since" />
-                    <include layout="@layout/view_account_fact_phone" />
-                    <include layout="@layout/view_account_fact_nationality" />
-                    <include layout="@layout/view_account_fact_birthday" />
-                    <include layout="@layout/view_account_fact_language" />
-                </GridLayout>
+                    <include
+                        layout="@layout/view_account_fact_phone"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <include
+                        layout="@layout/view_account_fact_member_since"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <include
+                        layout="@layout/view_account_fact_birthday"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <include
+                        layout="@layout/view_account_fact_language"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -190,12 +214,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:letterSpacing="0.08"
+                    android:fontFamily="@font/cormorant_garamond"
+                    android:letterSpacing="0.04"
                     android:text="@string/account_book_new_stay"
-                    android:textAllCaps="true"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
             </LinearLayout>
 

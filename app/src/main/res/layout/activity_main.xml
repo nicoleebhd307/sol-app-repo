@@ -50,11 +50,12 @@
                         app:cardElevation="0dp">
 
                         <ImageView
+                            android:id="@+id/imgHomeRoom"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:contentDescription="@string/dashboard_title"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/bg_login" />
+                            android:src="@drawable/bg_room_thumb" />
                     </androidx.cardview.widget.CardView>
 
                     <LinearLayout
@@ -228,7 +229,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="@string/home_status"
+                            android:text="@string/home_room"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -312,12 +313,108 @@
                     android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
-                    <include layout="@layout/view_quick_restaurant" />
-                    <include
+                    <LinearLayout
+                        android:id="@+id/quickRestaurant"
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_restaurant"
+                            android:src="@drawable/ic_restaurant"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_restaurant" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/quickRoomService"
-                        layout="@layout/view_quick_roomservice" />
-                    <include layout="@layout/view_quick_wellness" />
-                    <include layout="@layout/view_quick_transfer" />
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_room_service"
+                            android:src="@drawable/ic_roomservice"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_room_service" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickSpa"
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_spa"
+                            android:src="@drawable/ic_wellness"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_spa" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="84dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/quickTransport"
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_transport"
+                            android:src="@drawable/ic_transfer"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_transport" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickSouvenir"
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_souvenir"
+                            android:src="@drawable/ic_bag"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_souvenir" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickMore"
+                        style="@style/AllServiceItem">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/quick_more"
+                            android:src="@drawable/ic_more"
+                            android:tint="@color/sol_gold_dark" />
+
+                        <TextView
+                            style="@style/AllServiceLabel"
+                            android:text="@string/quick_more" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,10 +54,6 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnPaymentBack).setOnClickListener(view -> finish());
-        findViewById(R.id.rowPromoCode).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
-        findViewById(R.id.rowSpecialRequest).setOnClickListener(view ->
-                Toast.makeText(this, R.string.rs_feature_soon, Toast.LENGTH_SHORT).show());
         findViewById(R.id.btnPayNow).setOnClickListener(view -> payNow());
     }
 
@@ -80,23 +77,49 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
                 CurrencyFormatter.format(RoomServiceCart.getTotal()));
     }
 
+    private boolean methodMenuExpanded = false;
+
     private void bindPaymentMethods() {
-        findViewById(R.id.rowMethodRoomBill).setOnClickListener(view -> selectMethod("room_bill"));
+        // "Pay to room bill" was removed: fall back to bank card if it carried over from a prior cart.
+        if ("room_bill".equals(RoomServiceCart.getPaymentMethod())) {
+            RoomServiceCart.setPaymentMethod("bank_card");
+        }
+        findViewById(R.id.paymentMethodSelector).setOnClickListener(view -> toggleMethodMenu());
         findViewById(R.id.rowMethodBankCard).setOnClickListener(view -> selectMethod("bank_card"));
         findViewById(R.id.rowMethodEwallet).setOnClickListener(view -> selectMethod("e_wallet"));
         renderMethodSelection();
+        renderMethodMenu();
+    }
+
+    private void toggleMethodMenu() {
+        methodMenuExpanded = !methodMenuExpanded;
+        renderMethodMenu();
+    }
+
+    private void renderMethodMenu() {
+        findViewById(R.id.paymentMethodOptions).setVisibility(
+                methodMenuExpanded ? View.VISIBLE : View.GONE);
+        findViewById(R.id.imgMethodChevron).setRotation(methodMenuExpanded ? 180f : 0f);
     }
 
     private void selectMethod(String method) {
         RoomServiceCart.setPaymentMethod(method);
+        methodMenuExpanded = false;
         renderMethodSelection();
+        renderMethodMenu();
     }
 
     private void renderMethodSelection() {
         String method = RoomServiceCart.getPaymentMethod();
-        renderRadio(findViewById(R.id.radioRoomBill), "room_bill".equals(method));
         renderRadio(findViewById(R.id.radioBankCard), "bank_card".equals(method));
         renderRadio(findViewById(R.id.radioEwallet), "e_wallet".equals(method));
+
+        boolean ewallet = "e_wallet".equals(method);
+        ((TextView) findViewById(R.id.txtSelectedMethod)).setText(
+                ewallet ? R.string.rs_pay_ewallet : R.string.rs_pay_bank_card);
+        ((ImageView) findViewById(R.id.imgSelectedMethod)).setImageResource(
+                ewallet ? R.drawable.ic_wallet : R.drawable.ic_card);
+
         findViewById(R.id.cardCardDetails).setVisibility(
                 "bank_card".equals(method) ? View.VISIBLE : View.GONE);
     }

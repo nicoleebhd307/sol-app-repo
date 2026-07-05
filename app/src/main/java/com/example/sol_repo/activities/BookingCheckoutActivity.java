@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.sol_repo.R;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
@@ -54,7 +53,6 @@ public class BookingCheckoutActivity extends AppCompatActivity {
     private EditText fullNameInput;
     private EditText emailInput;
     private CheckBox acceptPoliciesCheckBox;
-    private SwitchCompat saveProfileSwitch;
     private TextView confirmBookingButton;
 
     @Override
@@ -100,7 +98,6 @@ public class BookingCheckoutActivity extends AppCompatActivity {
         fullNameInput = findViewById(R.id.inputFullName);
         emailInput = findViewById(R.id.inputEmail);
         acceptPoliciesCheckBox = findViewById(R.id.checkAcceptPolicies);
-        saveProfileSwitch = findViewById(R.id.switchSaveProfile);
         confirmBookingButton = findViewById(R.id.btnConfirmBooking);
     }
 
@@ -214,7 +211,7 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                 fullName,
                 email,
                 phone,
-                saveProfileSwitch.isChecked(),
+                true,
                 new com.example.sol_repo.dals.FirebaseCallback<com.example.sol_repo.models.BookingCreationResult>() {
                     @Override
                     public void onSuccess(com.example.sol_repo.models.BookingCreationResult result) {

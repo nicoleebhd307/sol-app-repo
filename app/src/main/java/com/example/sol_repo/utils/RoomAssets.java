@@ -25,6 +25,22 @@ public final class RoomAssets {
         return R.string.badge_ocean_view;
     }
 
+    /** Picks a representative room photo from the room/type name for list thumbnails. */
+    public static int roomImageForName(String roomName) {
+        String name = roomName == null ? "" : roomName.toLowerCase(Locale.US);
+        if (name.contains("garden")) {
+            return R.drawable.bg_room_garden;
+        }
+        if (name.contains("pool")) {
+            return R.drawable.bg_room_pool;
+        }
+        if (name.contains("beach") || name.contains("sea") || name.contains("ocean")
+                || name.contains("villa") || name.contains("suite")) {
+            return R.drawable.bg_room_beach;
+        }
+        return R.drawable.bg_room_thumb;
+    }
+
     public static int amenityIconFor(String amenityName) {
         String name = amenityName == null ? "" : amenityName.toLowerCase(Locale.US);
         if (name.contains("wi-fi") || name.contains("wifi")) {
