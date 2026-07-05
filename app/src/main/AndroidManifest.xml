@@ -47,6 +47,15 @@
         <activity
             android:name=".activities.SignUpDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.SouvenirStoreActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SouvenirCartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SouvenirConfirmActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activities.LoginActivity"

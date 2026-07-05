@@ -68,6 +68,41 @@
     <string name="details_error_nationality">Please enter your nationality</string>
     <string name="details_success">Welcome to Sol An Bang, %1$s!</string>
 
+    <string name="store_title">Souvenirs</string>
+    <string name="store_subtitle">Curated gifts and local keepsakes</string>
+    <string name="store_add">Add</string>
+    <string name="store_increase">Increase quantity</string>
+    <string name="store_decrease">Decrease quantity</string>
+    <string name="store_open_cart">Open cart</string>
+    <string name="store_promo_title">Thoughtful gifts</string>
+    <string name="store_promo_desc">Curated with care, perfect for every memory.</string>
+    <string name="store_footer">🔒 Secure stay services</string>
+    <string name="store_cart_empty">Your cart is empty. Add a souvenir first.</string>
+
+    <string name="store_cart_title">Cart &amp; Payment</string>
+    <string name="store_cart_subtitle">Review your items and complete payment</string>
+    <string name="store_qty_label">Qty: %1$d</string>
+    <string name="store_subtotal">Subtotal</string>
+    <string name="store_service_charge">Service Charge (5%)</string>
+    <string name="store_tax">Tax (8%)</string>
+    <string name="store_total">Total</string>
+    <string name="store_deliver_to_room">Deliver to Room</string>
+    <string name="store_room_number">Room Number</string>
+    <string name="store_secure_checkout">🔒  Secure Checkout  •  %1$s</string>
+    <string name="store_secure_payment">🔒 Secure payment</string>
+    <string name="store_order_failed">Could not place the order. Please try again.</string>
+
+    <string name="store_confirm_title">Order Confirmed</string>
+    <string name="store_confirm_thanks">Thank you! Your order has been placed successfully.</string>
+    <string name="store_order_number">Order Number</string>
+    <string name="store_confirm_gift">Your souvenir will be delivered to your room shortly.</string>
+    <string name="store_order_summary">Order Summary</string>
+    <string name="store_items">Items</string>
+    <string name="store_total_paid">Total Paid</string>
+    <string name="store_back_home">Back to Home</string>
+    <string name="store_concierge_title">Need help? Contact Concierge</string>
+    <string name="store_concierge_desc">We\'re here for you 24/7.</string>
+
     <string name="dashboard_title">Guest Dashboard</string>
     <string name="dashboard_welcome_customer">Welcome, %1$s</string>
     <string name="home_welcome_customer">Welcome, %1$s</string>
@@ -78,6 +113,14 @@
     <string name="home_check_out">CHECK-OUT</string>
     <string name="home_guests">GUESTS</string>
     <string name="home_status">STATUS</string>
+    <string name="home_room">ROOM</string>
+    <string name="home_all_services">ALL SERVICES</string>
+    <string name="service_restaurant">Restaurant</string>
+    <string name="service_room_service">Room Service</string>
+    <string name="service_spa">Spa Service</string>
+    <string name="service_transport">Transport</string>
+    <string name="service_souvenirs">Souvenirs</string>
+    <string name="service_more">More</string>
     <string name="home_guest_count">%1$d Guests</string>
     <string name="home_my_services">MY SERVICES</string>
     <string name="home_view_all">View all</string>

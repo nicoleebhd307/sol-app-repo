@@ -2,6 +2,8 @@ package com.example.sol_repo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +16,8 @@ import com.example.sol_repo.adapters.RecommendationAdapter;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.utils.BottomNavHelper;
+import com.example.sol_repo.utils.ImageLoader;
+import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
@@ -67,7 +71,20 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.txtCheckOut)).setText(formatDate(bookingSummary.getCheckOutDate()));
         ((TextView) findViewById(R.id.txtGuests)).setText(
                 getString(R.string.home_guest_count, bookingSummary.getNumGuests()));
-        ((TextView) findViewById(R.id.txtBookingStatus)).setText(formatStatus(bookingSummary.getStatus()));
+
+        // STATUS column now shows the room number of this booking.
+        String roomNumber = bookingSummary.getRoomNumber();
+        if (roomNumber != null && !roomNumber.isEmpty()) {
+            ((TextView) findViewById(R.id.txtBookingStatus)).setText(roomNumber);
+        } else {
+            firebaseDatabaseDal.getRoomNumberForBooking(bookingSummary.getBookingId(), number ->
+                    ((TextView) findViewById(R.id.txtBookingStatus)).setText(number));
+        }
+
+        // Booking thumbnail mirrors the room type's photo.
+        ImageView bookingImage = findViewById(R.id.imgBookingRoom);
+        firebaseDatabaseDal.getRoomTypeImageUrl(bookingSummary.getRoomTypeId(), imageUrl ->
+                ImageLoader.load(bookingImage, imageUrl, RoomAssets.ROOM_PLACEHOLDER));
 
         LinearLayout servicesContainer = findViewById(R.id.listHomeServices);
         LinearLayout recommendationsContainer = findViewById(R.id.listRecommendations);
@@ -77,12 +94,27 @@ public class MainActivity extends AppCompatActivity {
         firebaseDatabaseDal.getRecommendations(recommendations ->
                 new RecommendationAdapter(this, recommendations).renderInto(recommendationsContainer));
 
-        String activeBookingId = bookingSummary.getBookingId();
-        findViewById(R.id.quickRoomService).setOnClickListener(view -> {
+        bindServiceTiles(bookingSummary.getBookingId());
+    }
+
+    private void bindServiceTiles(String activeBookingId) {
+        findViewById(R.id.tileRoomService).setOnClickListener(view -> {
             Intent intent = new Intent(this, RoomServiceActivity.class);
             intent.putExtra(RoomServiceActivity.EXTRA_BOOKING_ID, activeBookingId);
             startActivity(intent);
         });
+        findViewById(R.id.tileSouvenirs).setOnClickListener(view -> {
+            Intent intent = new Intent(this, SouvenirStoreActivity.class);
+            intent.putExtra(SouvenirStoreActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
+
+        View.OnClickListener comingSoon = view ->
+                Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
+        findViewById(R.id.tileRestaurant).setOnClickListener(comingSoon);
+        findViewById(R.id.tileSpa).setOnClickListener(comingSoon);
+        findViewById(R.id.tileTransport).setOnClickListener(comingSoon);
+        findViewById(R.id.tileMore).setOnClickListener(comingSoon);
     }
 
     private String extractFirstName(String fullName) {

@@ -50,6 +50,7 @@
                         app:cardElevation="0dp">
 
                         <ImageView
+                            android:id="@+id/imgBookingRoom"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:contentDescription="@string/dashboard_title"
@@ -228,7 +229,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plus_jakarta_sans"
-                            android:text="@string/home_status"
+                            android:text="@string/home_room"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -241,7 +242,7 @@
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_gold"
                             android:textSize="12sp"
-                            tools:text="Confirmed" />
+                            tools:text="D401" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -301,24 +302,95 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:text="@string/home_quick_access"
+                    android:text="@string/home_all_services"
                     android:textColor="@color/sol_text_primary"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <GridLayout
                     android:layout_width="match_parent"
-                    android:layout_height="84dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:columnCount="3">
 
-                    <include layout="@layout/view_quick_restaurant" />
-                    <include
-                        android:id="@+id/quickRoomService"
-                        layout="@layout/view_quick_roomservice" />
-                    <include layout="@layout/view_quick_wellness" />
-                    <include layout="@layout/view_quick_transfer" />
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/tileRestaurant"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_restaurant" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_restaurant" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileRoomService"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_roomservice" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_room_service" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileSpa"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_wellness" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_spa" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileTransport"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_transfer" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_transport" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileSouvenirs"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_bag" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_souvenirs" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileMore"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_more" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_more" />
+                    </LinearLayout>
+                </GridLayout>
             </LinearLayout>
 
             <LinearLayout

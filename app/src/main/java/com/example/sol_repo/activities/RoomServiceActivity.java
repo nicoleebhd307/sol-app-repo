@@ -69,6 +69,9 @@ public class RoomServiceActivity extends AppCompatActivity {
         menuContainer = findViewById(R.id.listMenuItems);
         categoriesRow = findViewById(R.id.rowCategories);
 
+        com.example.sol_repo.utils.BottomNavHelper.setup(this,
+                com.example.sol_repo.utils.BottomNavHelper.Tab.SERVICES);
+
         firebaseDatabaseDal.getBookingForCustomer(sessionManager.getCustomerId(), bookingId, resolvedBooking -> {
             if (resolvedBooking == null) {
                 Toast.makeText(this, R.string.booking_access_denied, Toast.LENGTH_LONG).show();
