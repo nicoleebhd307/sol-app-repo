@@ -16,6 +16,7 @@ import com.example.sol_repo.R;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.Customer;
+import com.example.sol_repo.utils.BottomNavHelper;
 import com.example.sol_repo.utils.ImageLoader;
 import com.example.sol_repo.utils.SessionManager;
 
@@ -59,6 +60,7 @@ public class AccountActivity extends AppCompatActivity {
 
     private void bindViews() {
         bookingsContainer = findViewById(R.id.listBookings);
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.PROFILE);
     }
 
     private void bindProfile() {
@@ -126,17 +128,55 @@ public class AccountActivity extends AppCompatActivity {
             return;
         }
 
+        String selectedId = reconcileSelectedSession(bookings);
         for (BookingSummary booking : bookings) {
             View itemView = inflater.inflate(R.layout.item_account_booking, bookingsContainer, false);
-            bindBookingItem(itemView, booking);
+            bindBookingItem(itemView, booking, selectedId);
             bookingsContainer.addView(itemView);
         }
     }
 
-    private void bindBookingItem(View itemView, BookingSummary booking) {
+    /**
+     * Ensures the persisted session points to an active in-stay booking. If the stored one is no
+     * longer active (checked out / not this stay), it falls back to the first active booking.
+     * Returns the resolved active session booking id, or null if the guest has no active stay.
+     */
+    private String reconcileSelectedSession(List<BookingSummary> bookings) {
+        String selected = sessionManager.getSelectedBookingId();
+        BookingSummary firstActive = null;
+        boolean selectedStillActive = false;
+        for (BookingSummary booking : bookings) {
+            if (isActiveStay(booking)) {
+                if (firstActive == null) {
+                    firstActive = booking;
+                }
+                if (booking.getBookingId().equals(selected)) {
+                    selectedStillActive = true;
+                }
+            }
+        }
+        if (!selectedStillActive) {
+            selected = firstActive != null ? firstActive.getBookingId() : null;
+            if (selected != null) {
+                sessionManager.setSelectedBookingId(selected);
+            } else {
+                sessionManager.clearSelectedBookingId();
+            }
+        }
+        return selected;
+    }
+
+    private void bindBookingItem(View itemView, BookingSummary booking, String selectedId) {
         boolean active = isActiveStay(booking);
         boolean upcoming = isUpcomingStay(booking);
+        boolean selectedSession = active && booking.getBookingId().equals(selectedId);
         TextView statusView = itemView.findViewById(R.id.txtAccountBookingStatus);
+
+        itemView.setBackgroundResource(selectedSession
+                ? R.drawable.bg_booking_selected
+                : R.drawable.bg_dashboard_card);
+        itemView.findViewById(R.id.txtSessionBadge)
+                .setVisibility(selectedSession ? View.VISIBLE : View.GONE);
 
         ((TextView) itemView.findViewById(R.id.txtAccountBookingRoom)).setText(booking.getRoomTypeName());
         ((TextView) itemView.findViewById(R.id.txtAccountBookingCode)).setText(
@@ -168,6 +208,9 @@ public class AccountActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.account_booking_locked, Toast.LENGTH_LONG).show();
             return;
         }
+
+        // Switch the active session to this booking so Home/Services follow it.
+        sessionManager.setSelectedBookingId(booking.getBookingId());
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_BOOKING_ID, booking.getBookingId());

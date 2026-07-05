@@ -20,6 +20,54 @@
     <string name="login_database_error">Mock database could not be loaded</string>
     <string name="forgot_password_message">Password reset will be available soon</string>
     <string name="sign_up_message">Sign up flow will be added in the next screen</string>
+
+    <string name="signup_title">Create account</string>
+    <string name="signup_subtitle">Begin your journey to effortless luxury</string>
+    <string name="signup_full_name_hint">Full name</string>
+    <string name="signup_confirm_password_hint">Confirm password</string>
+    <string name="signup_agree_prefix">I agree to the </string>
+    <string name="signup_terms">Terms of Service</string>
+    <string name="signup_agree_and"> and </string>
+    <string name="signup_privacy">Privacy Policy</string>
+    <string name="signup_button">Sign Up</string>
+    <string name="signup_or">or</string>
+    <string name="signup_google">Google</string>
+    <string name="signup_apple">Apple</string>
+    <string name="signup_facebook">Facebook</string>
+    <string name="signup_have_account">Already have an account? </string>
+    <string name="signup_sign_in">Sign in</string>
+    <string name="signup_social_soon">Social sign-up will be available soon</string>
+    <string name="signup_terms_soon">Terms &amp; Privacy will be available soon</string>
+    <string name="signup_back">Back</string>
+
+    <string name="signup_error_name">Please enter your full name</string>
+    <string name="signup_error_email">Please enter a valid email address</string>
+    <string name="signup_error_password_short">Password must be at least 6 characters</string>
+    <string name="signup_error_confirm">Passwords do not match</string>
+    <string name="signup_error_agree">Please accept the Terms &amp; Privacy Policy</string>
+    <string name="signup_error_email_taken">This email is already registered</string>
+    <string name="signup_error_generic">Could not create your account. Please try again.</string>
+
+    <string name="details_title">Tell us about you</string>
+    <string name="details_subtitle">A few details to personalise your stay</string>
+    <string name="details_country">COUNTRY</string>
+    <string name="details_phone_label">MOBILE NUMBER</string>
+    <string name="details_phone_hint">901 234 567</string>
+    <string name="details_dob_label">DATE OF BIRTH</string>
+    <string name="details_dob_hint">Select your date of birth</string>
+    <string name="details_nationality_label">NATIONALITY</string>
+    <string name="details_nationality_hint">e.g. Vietnam</string>
+    <string name="details_language_label">PREFERRED LANGUAGE</string>
+    <string name="details_language_vi">Tiếng Việt</string>
+    <string name="details_language_en">English</string>
+    <string name="details_id_label">ID / PASSPORT (OPTIONAL)</string>
+    <string name="details_id_hint">e.g. B12345678</string>
+    <string name="details_finish">Create Account  →</string>
+    <string name="details_error_phone">Please enter your mobile number</string>
+    <string name="details_error_dob">Please select your date of birth</string>
+    <string name="details_error_nationality">Please enter your nationality</string>
+    <string name="details_success">Welcome to Sol An Bang, %1$s!</string>
+
     <string name="dashboard_title">Guest Dashboard</string>
     <string name="dashboard_welcome_customer">Welcome, %1$s</string>
     <string name="home_welcome_customer">Welcome, %1$s</string>
@@ -40,6 +88,10 @@
     <string name="quick_transfer">Transfer</string>
     <string name="home_recommended">RECOMMENDED FOR YOU</string>
     <string name="home_view_itinerary">VIEW FULL ITINERARY</string>
+    <string name="nav_coming_soon">This section will be available soon</string>
+    <string name="nav_no_active_stay">You have no active stay. Choose an in-stay booking first.</string>
+    <string name="account_session_viewing">VIEWING</string>
+    <string name="account_session_switched">Now viewing %1$s</string>
     <string name="nav_home">Home</string>
     <string name="nav_stay">Stay</string>
     <string name="nav_services">Services</string>

@@ -13,6 +13,7 @@ import com.example.sol_repo.adapters.HomeServiceAdapter;
 import com.example.sol_repo.adapters.RecommendationAdapter;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
+import com.example.sol_repo.utils.BottomNavHelper;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME);
         bindHomeData();
     }
 
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 return;
             }
+            // Remember this active booking as the session so the bottom nav follows it.
+            sessionManager.setSelectedBookingId(bookingSummary.getBookingId());
             bindBooking(bookingSummary);
         });
     }
@@ -100,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void resolveBooking(com.example.sol_repo.dals.FirebaseCallback<BookingSummary> callback) {
         String selectedBookingId = getIntent().getStringExtra(EXTRA_BOOKING_ID);
+        if (selectedBookingId == null) {
+            selectedBookingId = sessionManager.getSelectedBookingId();
+        }
         if (selectedBookingId != null) {
             firebaseDatabaseDal.getBookingForCustomer(sessionManager.getCustomerId(), selectedBookingId, callback);
         } else {

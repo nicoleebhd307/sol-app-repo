@@ -12,6 +12,7 @@ public class SessionManager {
     private static final String KEY_FULL_NAME = "full_name";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_STATUS = "status";
+    private static final String KEY_SELECTED_BOOKING_ID = "selected_booking_id";
 
     private final SharedPreferences preferences;
 
@@ -26,6 +27,7 @@ public class SessionManager {
         editor.putString(KEY_FULL_NAME, customer.getFullName());
         editor.putString(KEY_EMAIL, customer.getEmail());
         editor.putString(KEY_STATUS, customer.getStatus());
+        editor.remove(KEY_SELECTED_BOOKING_ID);
         editor.apply();
     }
 
@@ -51,6 +53,19 @@ public class SessionManager {
 
     public String getStatus() {
         return preferences.getString(KEY_STATUS, "");
+    }
+
+    /** The booking id whose in-stay session the guest is currently viewing across Home/Services. */
+    public String getSelectedBookingId() {
+        return preferences.getString(KEY_SELECTED_BOOKING_ID, null);
+    }
+
+    public void setSelectedBookingId(String bookingId) {
+        preferences.edit().putString(KEY_SELECTED_BOOKING_ID, bookingId).apply();
+    }
+
+    public void clearSelectedBookingId() {
+        preferences.edit().remove(KEY_SELECTED_BOOKING_ID).apply();
     }
 
     public void clearSession() {

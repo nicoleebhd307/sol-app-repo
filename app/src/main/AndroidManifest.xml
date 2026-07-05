@@ -41,6 +41,12 @@
         <activity
             android:name=".activities.RoomServiceTrackingActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SignUpDetailsActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activities.LoginActivity"

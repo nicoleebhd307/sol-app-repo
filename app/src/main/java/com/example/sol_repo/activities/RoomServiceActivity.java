@@ -158,7 +158,7 @@ public class RoomServiceActivity extends AppCompatActivity {
             chip.setPadding(dpToPx(16), 0, dpToPx(16), 0);
             chip.setGravity(android.view.Gravity.CENTER);
             chip.setTextSize(13);
-            chip.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter));
+            chip.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(this, R.font.plus_jakarta_sans));
             chip.setText(CATEGORY_LABELS[i]);
             chip.setOnClickListener(view -> {
                 selectedCategory = key;

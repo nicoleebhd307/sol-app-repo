@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login_root"
+    android:fillViewport="true"
+    tools:context=".activities.SignUpDetailsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+        <FrameLayout
+            android:id="@+id/btnDetailsBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_circle_white"
+            android:contentDescription="@string/signup_back"
+            android:elevation="2dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_arrowleft" />
+        </FrameLayout>
+
+        <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/logo_content_description"
+            android:src="@drawable/sol_logo"
+            app:tint="@color/sol_gold_dark" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/cormorant_garamond"
+            android:gravity="center"
+            android:text="@string/details_title"
+            android:textColor="@color/sol_text_primary"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:text="@string/details_subtitle"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Phone -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:letterSpacing="0.08"
+                    android:text="@string/details_country"
+                    android:textColor="@color/sol_text_secondary"
+                    android:textSize="11sp" />
+
+                <EditText
+                    android:id="@+id/inputCountryCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_input"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:importantForAutofill="no"
+                    android:inputType="phone"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="+84"
+                    android:textColor="@color/sol_text_primary"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:letterSpacing="0.08"
+                    android:text="@string/details_phone_label"
+                    android:textColor="@color/sol_text_secondary"
+                    android:textSize="11sp" />
+
+                <EditText
+                    android:id="@+id/inputMobileNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_input"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:hint="@string/details_phone_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="phone"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textColor="@color/sol_text_primary"
+                    android:textColorHint="@color/sol_text_secondary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Date of birth -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:letterSpacing="0.08"
+            android:text="@string/details_dob_label"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="11sp" />
+
+        <FrameLayout
+            android:id="@+id/rowDob"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_input"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_calendar" />
+
+            <TextView
+                android:id="@+id/txtDob"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center_vertical"
+                android:paddingStart="52dp"
+                android:paddingEnd="44dp"
+                android:text="@string/details_dob_hint"
+                android:textColor="@color/sol_text_secondary"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_chevrondown" />
+        </FrameLayout>
+
+        <!-- Nationality -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:letterSpacing="0.08"
+            android:text="@string/details_nationality_label"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="11sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_input">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_globe" />
+
+            <EditText
+                android:id="@+id/inputNationality"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:hint="@string/details_nationality_hint"
+                android:importantForAutofill="no"
+                android:inputType="textCapWords"
+                android:paddingStart="52dp"
+                android:paddingEnd="16dp"
+                android:singleLine="true"
+                android:text="@string/account_nationality_default"
+                android:textColor="@color/sol_text_primary"
+                android:textColorHint="@color/sol_text_secondary"
+                android:textSize="15sp" />
+        </FrameLayout>
+
+        <!-- Preferred language -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:letterSpacing="0.08"
+            android:text="@string/details_language_label"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="11sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chipLanguageVi"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center"
+                android:text="@string/details_language_vi"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/chipLanguageEn"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center"
+                android:text="@string/details_language_en"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- ID / Passport (optional) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:letterSpacing="0.08"
+            android:text="@string/details_id_label"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="11sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_input">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_profile"
+                app:tint="@color/sol_gold_dark" />
+
+            <EditText
+                android:id="@+id/inputIdPassport"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:hint="@string/details_id_hint"
+                android:importantForAutofill="no"
+                android:inputType="textCapCharacters"
+                android:paddingStart="52dp"
+                android:paddingEnd="16dp"
+                android:singleLine="true"
+                android:textColor="@color/sol_text_primary"
+                android:textColorHint="@color/sol_text_secondary"
+                android:textSize="15sp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/btnFinishSignup"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/bg_gold_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/cormorant_garamond"
+            android:gravity="center"
+            android:text="@string/details_finish"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

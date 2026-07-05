@@ -69,7 +69,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:singleLine="true"
                             android:textColor="@color/sol_text_primary"
                             android:textSize="18sp"
@@ -85,7 +85,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/inter"
+                                android:fontFamily="@font/plus_jakarta_sans"
                                 android:text="@string/booking_id_prefix"
                                 android:textColor="@color/sol_text_secondary"
                                 android:textSize="12sp" />
@@ -94,7 +94,7 @@
                                 android:id="@+id/txtBookingCode"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/inter"
+                                android:fontFamily="@font/plus_jakarta_sans"
                                 android:textColor="@color/sol_gold"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
@@ -128,7 +128,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/home_check_in"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
@@ -139,7 +139,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_text_primary"
                             android:textSize="12sp"
                             tools:text="14 Oct 2026" />
@@ -161,7 +161,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/home_check_out"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
@@ -172,7 +172,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_text_primary"
                             android:textSize="12sp"
                             tools:text="15 Oct 2026" />
@@ -194,7 +194,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/home_guests"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
@@ -205,7 +205,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_text_primary"
                             android:textSize="12sp"
                             tools:text="2" />
@@ -227,7 +227,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:text="@string/home_status"
                             android:textColor="@color/sol_text_secondary"
                             android:textSize="11sp"
@@ -238,7 +238,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/inter"
+                            android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_gold"
                             android:textSize="12sp"
                             tools:text="Confirmed" />
@@ -264,7 +264,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/inter"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:text="@string/home_my_services"
                         android:textColor="@color/sol_text_primary"
                         android:textSize="12sp"
@@ -273,7 +273,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:fontFamily="@font/inter"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:gravity="center"
                         android:text="@string/home_view_all"
                         android:textColor="@color/sol_gold_dark"
@@ -300,7 +300,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter"
+                    android:fontFamily="@font/plus_jakarta_sans"
                     android:text="@string/home_quick_access"
                     android:textColor="@color/sol_text_primary"
                     android:textSize="12sp"
@@ -339,7 +339,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/inter"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:text="@string/home_recommended"
                         android:textColor="@color/sol_text_primary"
                         android:textSize="12sp"
@@ -348,7 +348,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:fontFamily="@font/inter"
+                        android:fontFamily="@font/plus_jakarta_sans"
                         android:gravity="center"
                         android:text="@string/home_view_all"
                         android:textColor="@color/sol_gold_dark"

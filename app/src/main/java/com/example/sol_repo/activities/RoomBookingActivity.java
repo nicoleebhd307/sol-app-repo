@@ -319,7 +319,7 @@ public class RoomBookingActivity extends AppCompatActivity {
                 ? R.drawable.bg_chip_selected
                 : R.drawable.bg_chip_unselected);
         chip.setTextColor(getColor(selected ? R.color.sol_gold_dark : R.color.sol_text_primary));
-        chip.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter),
+        chip.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(this, R.font.plus_jakarta_sans),
                 selected ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
     }
 }

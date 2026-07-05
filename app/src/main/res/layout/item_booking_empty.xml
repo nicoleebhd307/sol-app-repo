@@ -31,7 +31,7 @@
             android:id="@+id/txtEmptyBookingTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/inter"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:textColor="@color/sol_text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:fontFamily="@font/inter"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:text="@string/account_no_current_message"
             android:textColor="@color/sol_text_secondary"
             android:textSize="12sp" />
@@ -51,7 +51,7 @@
             android:layout_height="34dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_outline_button"
-            android:fontFamily="@font/inter"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:gravity="center"
             android:minWidth="140dp"
             android:paddingStart="12dp"

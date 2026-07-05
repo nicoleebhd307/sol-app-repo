@@ -32,6 +32,7 @@ import java.util.Map;
 public class FirebaseDatabaseDal {
     private static final long BOOKING_CODE_SEED = 1045L;
     private static final long ORDER_CODE_SEED = 1045L;
+    private static final long CUSTOMER_ID_SEED = 3L;
 
     private final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -61,6 +62,76 @@ public class FirebaseDatabaseDal {
     private void fetchCustomer(String customerId, ValueListener<Customer> onValue, FailureListener onFailure) {
         readOnce(rootRef.child("customers").child(customerId), snapshot ->
                 onValue.onValue(snapshot.exists() ? readCustomer(customerId, snapshot) : null), onFailure);
+    }
+
+    public void emailExists(String email, FirebaseCallback<Boolean> callback) {
+        readOnce(rootRef.child("accounts").child(sanitizeEmailKey(email)), snapshot ->
+                callback.onSuccess(snapshot.exists()), callback::onError);
+    }
+
+    /**
+     * Creates a brand-new customer account. Writes /accounts and /customers atomically.
+     * New sign-ups always start as membershipTier "new" and status "pre_stay".
+     * Returns the created Customer (with generated customerId) on success, or null if the
+     * email was taken between the availability check and the write.
+     */
+    public void createCustomerAccount(String fullName, String email, String password, String phone,
+                                      String dob, String nationality, String language, String idPassport,
+                                      FirebaseCallback<Customer> callback) {
+        String accountKey = sanitizeEmailKey(email);
+        readOnce(rootRef.child("accounts").child(accountKey), existing -> {
+            if (existing.exists()) {
+                callback.onSuccess(null);
+                return;
+            }
+
+            nextSequence("customer", CUSTOMER_ID_SEED, sequence -> {
+                String customerId = "c_" + sequence;
+                String now = currentTimestamp();
+                long memberSince = System.currentTimeMillis();
+
+                Map<String, Object> account = new HashMap<>();
+                account.put("email", email);
+                account.put("password", password);
+                account.put("role", "customer");
+                account.put("customerId", customerId);
+
+                Map<String, Object> stats = new HashMap<>();
+                stats.put("bookingCount", 0);
+                stats.put("suiteBookingCount", 0);
+
+                Map<String, Object> customer = new HashMap<>();
+                customer.put("fullName", fullName);
+                customer.put("email", email);
+                customer.put("phone", phone);
+                customer.put("dob", dob);
+                customer.put("nationality", nationality);
+                customer.put("language", language);
+                customer.put("idPassport", idPassport);
+                customer.put("membershipTier", "new");
+                customer.put("status", "pre_stay");
+                customer.put("stats", stats);
+                customer.put("memberSince", memberSince);
+                customer.put("createdAt", now);
+
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("/accounts/" + accountKey, account);
+                updates.put("/customers/" + customerId, customer);
+
+                rootRef.updateChildren(updates, (error, ref) -> {
+                    if (error != null) {
+                        callback.onError(error.getMessage());
+                        return;
+                    }
+                    Customer created = new Customer(customerId, fullName, email, phone, "pre_stay", now);
+                    created.setDob(dob);
+                    created.setNationality(nationality);
+                    created.setLanguage(language);
+                    created.setMembershipTier("new");
+                    callback.onSuccess(created);
+                });
+            }, callback::onError);
+        }, callback::onError);
     }
 
     // ===================== Bookings =====================

@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.txtForgotPassword).setOnClickListener(view ->
                 Toast.makeText(this, R.string.forgot_password_message, Toast.LENGTH_SHORT).show());
         findViewById(R.id.txtSignUp).setOnClickListener(view ->
-                Toast.makeText(this, R.string.sign_up_message, Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, SignUpActivity.class)));
     }
 
     private void handleLogin() {
