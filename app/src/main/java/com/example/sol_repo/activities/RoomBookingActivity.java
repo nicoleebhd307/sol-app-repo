@@ -19,6 +19,7 @@ import com.example.sol_repo.models.RoomType;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.ImageLoader;
 import com.example.sol_repo.utils.RoomAssets;
+import com.example.sol_repo.utils.SessionManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -67,6 +68,8 @@ public class RoomBookingActivity extends AppCompatActivity {
         checkInCalendar.add(Calendar.DAY_OF_MONTH, 7);
         checkOutCalendar.add(Calendar.DAY_OF_MONTH, 13);
 
+        findViewById(R.id.btnBookingBack).setOnClickListener(view -> goHome());
+        findViewById(R.id.btnBookingProfile).setOnClickListener(view -> goProfile());
         findViewById(R.id.cardDateSearch).setOnClickListener(view -> pickCheckInDate());
         findViewById(R.id.btnSearchRooms).setOnClickListener(view -> loadRooms());
         findViewById(R.id.btnOpenFilter).setOnClickListener(view -> showFilterSheet());
@@ -77,6 +80,27 @@ public class RoomBookingActivity extends AppCompatActivity {
 
         renderDateRange();
         loadRooms();
+    }
+
+    /** Back arrow returns to the home dashboard for the active stay. */
+    private void goHome() {
+        String bookingId = new SessionManager(this).getSelectedBookingId();
+        if (bookingId == null) {
+            finish();
+            return;
+        }
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    /** Profile icon navigates to the account screen. */
+    private void goProfile() {
+        Intent intent = new Intent(this, AccountActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void pickCheckInDate() {
