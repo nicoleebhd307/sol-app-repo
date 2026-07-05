@@ -56,6 +56,9 @@
         <activity
             android:name=".activities.SouvenirConfirmActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.DiningReservationActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activities.LoginActivity"

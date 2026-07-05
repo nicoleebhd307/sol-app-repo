@@ -3,6 +3,7 @@ package com.example.sol_repo.dals;
 import com.example.sol_repo.models.BookingCreationResult;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.Customer;
+import com.example.sol_repo.models.DiningTable;
 import com.example.sol_repo.models.HomeServiceItem;
 import com.example.sol_repo.models.MenuItem;
 import com.example.sol_repo.models.OrderCreationResult;
@@ -26,9 +27,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /** Realtime Database backed replacement for the retired MockDatabaseDal (SQLite). */
 public class FirebaseDatabaseDal {
@@ -36,6 +39,7 @@ public class FirebaseDatabaseDal {
     private static final long ORDER_CODE_SEED = 1045L;
     private static final long CUSTOMER_ID_SEED = 3L;
     private static final long STORE_ORDER_SEED = 122L;
+    private static final long DINING_RES_SEED = 1200L;
 
     private final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -678,6 +682,92 @@ public class FirebaseDatabaseDal {
                 }
             });
         }, callback::onError);
+    }
+
+    // ===================== Restaurant / dining =====================
+
+    public void getDiningTables(FirebaseCallback<List<DiningTable>> callback) {
+        readOnce(rootRef.child("diningTables"), snapshot -> {
+            List<DiningTable> tables = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                tables.add(new DiningTable(
+                        child.getKey(),
+                        child.child("code").getValue(String.class),
+                        valueOrZeroInt(child.child("capacity")),
+                        child.child("shape").getValue(String.class),
+                        valueOrZeroInt(child.child("sortOrder"))));
+            }
+            tables.sort(Comparator.comparingInt(DiningTable::getSortOrder));
+            callback.onSuccess(tables);
+        }, callback::onError);
+    }
+
+    /** Returns the set of table ids already reserved for the given date + time slot. */
+    public void getBookedTableIds(String date, String timeSlot, FirebaseCallback<Set<String>> callback) {
+        readOnce(rootRef.child("diningReservations"), snapshot -> {
+            Set<String> booked = new HashSet<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                String status = child.child("status").getValue(String.class);
+                if (!"pending".equals(status) && !"confirmed".equals(status) && !"completed".equals(status)) {
+                    continue;
+                }
+                if (date.equals(child.child("reservationDate").getValue(String.class))
+                        && timeSlot.equals(child.child("reservationTime").getValue(String.class))) {
+                    String tableId = child.child("tableId").getValue(String.class);
+                    if (tableId != null) {
+                        booked.add(tableId);
+                    }
+                }
+            }
+            callback.onSuccess(booked);
+        }, callback::onError);
+    }
+
+    public void createDiningReservation(String bookingId, String customerId, String tableId, String tableCode,
+                                        int capacity, String date, String timeSlot, String venue,
+                                        FirebaseCallback<OrderCreationResult> callback) {
+        // Guard against a race: re-check the table is still free for this date + slot.
+        getBookedTableIds(date, timeSlot, bookedIds -> {
+            if (bookedIds.contains(tableId)) {
+                callback.onSuccess(null);
+                return;
+            }
+            nextSequence("diningReservation", DINING_RES_SEED, sequence -> {
+                String reservationId = rootRef.child("diningReservations").push().getKey();
+                String reservationCode = String.format(Locale.US, "DR-2026-%04d", sequence);
+                String now = currentTimestamp();
+
+                Map<String, Object> reservation = new HashMap<>();
+                reservation.put("reservationCode", reservationCode);
+                reservation.put("bookingId", bookingId);
+                reservation.put("customerId", customerId);
+                reservation.put("venue", venue);
+                reservation.put("venueType", "restaurant");
+                reservation.put("tableId", tableId);
+                reservation.put("tableCode", tableCode);
+                reservation.put("reservationDate", date);
+                reservation.put("reservationTime", timeSlot);
+                reservation.put("numGuests", capacity);
+                reservation.put("status", "confirmed");
+                reservation.put("createdAt", now);
+
+                Map<String, Object> serviceIndex = new HashMap<>();
+                serviceIndex.put("type", "dining");
+                serviceIndex.put("refId", reservationId);
+
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("/diningReservations/" + reservationId, reservation);
+                updates.put("/servicesByBooking/" + bookingId + "/dining_" + reservationId, serviceIndex);
+
+                rootRef.updateChildren(updates, (error, ref) -> {
+                    if (error != null) {
+                        callback.onError(error.getMessage());
+                    } else {
+                        callback.onSuccess(new OrderCreationResult(reservationId, reservationCode));
+                    }
+                });
+            }, callback::onError);
+        });
     }
 
     // ===================== Internal chaining helpers =====================

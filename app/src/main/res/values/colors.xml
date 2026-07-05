@@ -21,4 +21,6 @@
     <color name="color_icon_success">#FF2E7D32</color>
     <color name="color_icon_warning">#FFE58A00</color>
     <color name="color_icon_error">#FFB3261E</color>
+    <color name="sol_table_booked">#FFB4AEA4</color>
+    <color name="sol_table_booked_border">#FF9A9186</color>
 </resources>

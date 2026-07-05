@@ -109,9 +109,14 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        findViewById(R.id.tileRestaurant).setOnClickListener(view -> {
+            Intent intent = new Intent(this, DiningReservationActivity.class);
+            intent.putExtra(DiningReservationActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
+
         View.OnClickListener comingSoon = view ->
                 Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
-        findViewById(R.id.tileRestaurant).setOnClickListener(comingSoon);
         findViewById(R.id.tileSpa).setOnClickListener(comingSoon);
         findViewById(R.id.tileTransport).setOnClickListener(comingSoon);
         findViewById(R.id.tileMore).setOnClickListener(comingSoon);
