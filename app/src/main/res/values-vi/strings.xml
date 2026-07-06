@@ -337,4 +337,51 @@
     <string name="spa_arrival_desc">Vui lòng đến trước giờ buổi spa 10 phút.</string>
     <string name="spa_contact_concierge">Liên hệ Lễ tân</string>
     <string name="spa_sessions_plus">%1$s +%2$d buổi</string>
+
+    <!-- Airport transfer -->
+    <string name="transfer_title">Đưa đón sân bay</string>
+    <string name="transfer_subtitle">Dịch vụ đưa đón riêng tư, thoải mái giữa sân bay và khu nghỉ dưỡng.</string>
+    <string name="transfer_choose_type">Chọn loại chuyến</string>
+    <string name="transfer_choose_type_sub">Chọn cách bạn muốn di chuyển.</string>
+    <string name="transfer_pickup">Đón</string>
+    <string name="transfer_pickup_route">Sân bay → Khách sạn</string>
+    <string name="transfer_dropoff">Tiễn</string>
+    <string name="transfer_dropoff_route">Khách sạn → Sân bay</string>
+    <string name="transfer_info_intro">Chúng tôi chỉ cung cấp đưa đón sân bay ↔ khách sạn. Tiếp theo, bạn sẽ chọn giờ mong muốn.</string>
+    <string name="transfer_continue">Tiếp tục</string>
+    <string name="transfer_suite_only">Dịch vụ đưa đón sân bay chỉ dành cho khách hạng Suite.</string>
+
+    <string name="transfer_type_label">Loại chuyến</string>
+    <string name="transfer_preferred_date">Ngày mong muốn</string>
+    <string name="transfer_time_today_short">Hôm nay</string>
+    <string name="transfer_time_title">Giờ đến / Giờ đưa đón</string>
+    <string name="transfer_time_sub">Nhập giờ hạ cánh hoặc giờ đưa đón mong muốn.</string>
+    <string name="transfer_time_enter">Nhập giờ</string>
+    <string name="transfer_time_hint">HH:MM</string>
+    <string name="transfer_am">SA</string>
+    <string name="transfer_pm">CH</string>
+    <string name="transfer_time_format_note">Hỗ trợ định dạng 24 giờ</string>
+    <string name="transfer_time_info">Vui lòng nhập giờ thủ công. Lễ tân sẽ sắp xếp chuyến đưa đón khớp với lịch bay của bạn.</string>
+    <string name="transfer_error_time">Vui lòng nhập giờ hợp lệ (HH:MM).</string>
+
+    <string name="transfer_pickup_confirmed">Đã xác nhận đón</string>
+    <string name="transfer_dropoff_confirmed">Đã xác nhận tiễn</string>
+    <string name="transfer_confirmed_sub">Chúng tôi đã nhận được yêu cầu của bạn.</string>
+    <string name="transfer_booking_id">Mã đặt</string>
+    <string name="transfer_type_field">Loại chuyến</string>
+    <string name="transfer_from">Từ</string>
+    <string name="transfer_to">Đến</string>
+    <string name="transfer_datetime">Ngày &amp; Giờ</string>
+    <string name="transfer_guests">Số khách</string>
+    <string name="transfer_driver_pending_title">Đang sắp xếp tài xế</string>
+    <string name="transfer_driver_pending_desc">Chúng tôi sẽ sắp xếp tài xế gần giờ đón của bạn.</string>
+    <string name="transfer_booking_failed">Không thể hoàn tất đặt chuyến. Vui lòng thử lại.</string>
+
+    <string name="transfer_airport_name">Sân bay Quốc tế Đà Nẵng (DAD)</string>
+    <string name="transfer_resort_name">Sol An Bang Beach Resort</string>
+
+    <string name="transfer_offer_title">Đặt xe đưa đón sân bay?</string>
+    <string name="transfer_offer_message">Là khách hạng Suite, bạn được tặng chuyến đưa đón sân bay miễn phí. Bạn có muốn đặt ngay không?</string>
+    <string name="transfer_offer_yes">Đặt xe</string>
+    <string name="transfer_offer_no">Để sau</string>
 </resources>

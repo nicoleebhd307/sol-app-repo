@@ -41,6 +41,7 @@ public class FirebaseDatabaseDal {
     private static final long STORE_ORDER_SEED = 122L;
     private static final long DINING_RES_SEED = 1200L;
     private static final long SPA_BOOKING_SEED = 1000L;
+    private static final long TRANSFER_BOOKING_SEED = 1000L;
 
     /** Number of spa specialists on staff — the per-session slot capacity. */
     public static final int SPA_SESSION_CAPACITY = 10;
@@ -308,8 +309,9 @@ public class FirebaseDatabaseDal {
         if ("transfer".equals(type)) {
             readOnce(rootRef.child("transferBookings").child(refId), snapshot -> {
                 if (snapshot.exists()) {
+                    String transferType = snapshot.child("transferType").getValue(String.class);
                     accumulated.add(new HomeServiceItem(
-                            "Airport Pickup",
+                            "dropoff".equals(transferType) ? "Airport Drop-off" : "Airport Pickup",
                             snapshot.child("scheduledDatetime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
                             "transfer"));
@@ -994,6 +996,55 @@ public class FirebaseDatabaseDal {
                     callback.onError(error.getMessage());
                 } else {
                     callback.onSuccess(new OrderCreationResult(spaBookingId, bookingCode));
+                }
+            });
+        }, callback::onError);
+    }
+
+    // ===================== Airport transfer =====================
+
+    /**
+     * Books an airport transfer (Suite-only, complimentary). {@code transferType} is "pickup"
+     * (airport → hotel) or "dropoff" (hotel → airport). Indexed under the home "My Services" list.
+     */
+    public void createTransferBooking(String bookingId, String customerId, String transferType,
+                                      String fromLocation, String toLocation, String date, String time24,
+                                      String scheduledDisplay, int numGuests,
+                                      FirebaseCallback<OrderCreationResult> callback) {
+        nextSequence("transferBooking", TRANSFER_BOOKING_SEED, sequence -> {
+            String transferId = rootRef.child("transferBookings").push().getKey();
+            String prefix = "dropoff".equals(transferType) ? "DROP" : "PKUP";
+            String bookingCode = String.format(Locale.US, "%s-2026-%04d", prefix, sequence);
+            String now = currentTimestamp();
+
+            Map<String, Object> transfer = new HashMap<>();
+            transfer.put("bookingCode", bookingCode);
+            transfer.put("bookingId", bookingId);
+            transfer.put("customerId", customerId);
+            transfer.put("transferType", transferType);
+            transfer.put("fromLocation", fromLocation);
+            transfer.put("toLocation", toLocation);
+            transfer.put("reservationDate", date);
+            transfer.put("reservationTime", time24);
+            transfer.put("scheduledDatetime", scheduledDisplay);
+            transfer.put("numGuests", numGuests);
+            transfer.put("status", "pending");
+            transfer.put("createdAt", now);
+
+            Map<String, Object> serviceIndex = new HashMap<>();
+            serviceIndex.put("type", "transfer");
+            serviceIndex.put("refId", transferId);
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("/transferBookings/" + transferId, transfer);
+            updates.put("/transferBookingsByBooking/" + bookingId + "/" + transferId, true);
+            updates.put("/servicesByBooking/" + bookingId + "/transfer_" + transferId, serviceIndex);
+
+            rootRef.updateChildren(updates, (error, ref) -> {
+                if (error != null) {
+                    callback.onError(error.getMessage());
+                } else {
+                    callback.onSuccess(new OrderCreationResult(transferId, bookingCode));
                 }
             });
         }, callback::onError);

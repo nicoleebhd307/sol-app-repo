@@ -455,4 +455,51 @@
     <string name="spa_arrival_desc">Please arrive 10 minutes before your booked session time.</string>
     <string name="spa_contact_concierge">Contact Concierge</string>
     <string name="spa_sessions_plus">%1$s +%2$d more</string>
+
+    <!-- Airport transfer -->
+    <string name="transfer_title">Airport Transfer</string>
+    <string name="transfer_subtitle">Private and comfortable transfers between the airport and our resort.</string>
+    <string name="transfer_choose_type">Choose Transfer Type</string>
+    <string name="transfer_choose_type_sub">Select how you would like to travel.</string>
+    <string name="transfer_pickup">Pickup</string>
+    <string name="transfer_pickup_route">Airport → Hotel</string>
+    <string name="transfer_dropoff">Drop-off</string>
+    <string name="transfer_dropoff_route">Hotel → Airport</string>
+    <string name="transfer_info_intro">We only provide airport ↔ hotel transfers. Next, you\'ll choose your preferred time.</string>
+    <string name="transfer_continue">Continue</string>
+    <string name="transfer_suite_only">Airport transfer is available for Suite guests only.</string>
+
+    <string name="transfer_type_label">Transfer Type</string>
+    <string name="transfer_preferred_date">Preferred Date</string>
+    <string name="transfer_time_today_short">Today</string>
+    <string name="transfer_time_title">Arrival / Transfer Time</string>
+    <string name="transfer_time_sub">Enter your flight arrival or preferred transfer time.</string>
+    <string name="transfer_time_enter">Enter time</string>
+    <string name="transfer_time_hint">HH:MM</string>
+    <string name="transfer_am">AM</string>
+    <string name="transfer_pm">PM</string>
+    <string name="transfer_time_format_note">24-hour format supported</string>
+    <string name="transfer_time_info">Please enter the time manually. Our concierge will match your transfer to your flight schedule.</string>
+    <string name="transfer_error_time">Please enter a valid time (HH:MM).</string>
+
+    <string name="transfer_pickup_confirmed">Pickup Confirmed</string>
+    <string name="transfer_dropoff_confirmed">Drop-off Confirmed</string>
+    <string name="transfer_confirmed_sub">We\'ve received your booking.</string>
+    <string name="transfer_booking_id">Booking ID</string>
+    <string name="transfer_type_field">Transfer Type</string>
+    <string name="transfer_from">From</string>
+    <string name="transfer_to">To</string>
+    <string name="transfer_datetime">Date &amp; Time</string>
+    <string name="transfer_guests">Guests</string>
+    <string name="transfer_driver_pending_title">Driver Assignment Pending</string>
+    <string name="transfer_driver_pending_desc">We will assign your driver closer to your pickup time.</string>
+    <string name="transfer_booking_failed">Could not complete the transfer booking. Please try again.</string>
+
+    <string name="transfer_airport_name">Da Nang International Airport (DAD)</string>
+    <string name="transfer_resort_name">Sol An Bang Beach Resort</string>
+
+    <string name="transfer_offer_title">Arrange Airport Transfer?</string>
+    <string name="transfer_offer_message">As a Suite guest, you\'re entitled to a complimentary airport transfer. Would you like to arrange one now?</string>
+    <string name="transfer_offer_yes">Book transfer</string>
+    <string name="transfer_offer_no">Maybe later</string>
 </resources>

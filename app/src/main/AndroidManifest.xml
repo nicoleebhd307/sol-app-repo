@@ -71,6 +71,12 @@
         <activity
             android:name=".activities.SpaConfirmActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.TransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.TransferConfirmActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activities.LoginActivity"

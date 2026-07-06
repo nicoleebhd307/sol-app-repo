@@ -95,10 +95,10 @@ public class MainActivity extends AppCompatActivity {
         firebaseDatabaseDal.getRecommendations(recommendations ->
                 new RecommendationAdapter(this, recommendations).renderInto(recommendationsContainer));
 
-        bindServiceTiles(bookingSummary.getBookingId());
+        bindServiceTiles(bookingSummary.getBookingId(), bookingSummary.getRoomTypeId());
     }
 
-    private void bindServiceTiles(String activeBookingId) {
+    private void bindServiceTiles(String activeBookingId, String roomTypeId) {
         findViewById(R.id.tileRoomService).setOnClickListener(view -> {
             Intent intent = new Intent(this, RoomServiceActivity.class);
             intent.putExtra(RoomServiceActivity.EXTRA_BOOKING_ID, activeBookingId);
@@ -122,10 +122,36 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Airport transfer is a Suite-only perk: locked by default, unlocked once we confirm the tier.
+        configureTransferTile(activeBookingId, roomTypeId);
+
         View.OnClickListener comingSoon = view ->
                 Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
-        findViewById(R.id.tileTransport).setOnClickListener(comingSoon);
         findViewById(R.id.tileMore).setOnClickListener(comingSoon);
+    }
+
+    private void configureTransferTile(String activeBookingId, String roomTypeId) {
+        View transferTile = findViewById(R.id.tileTransport);
+        View lockBadge = findViewById(R.id.imgTransportLock);
+
+        // Default to locked until the room category is confirmed to be Suite.
+        transferTile.setAlpha(0.5f);
+        lockBadge.setVisibility(View.VISIBLE);
+        transferTile.setOnClickListener(view ->
+                Toast.makeText(this, R.string.transfer_suite_only, Toast.LENGTH_SHORT).show());
+
+        firebaseDatabaseDal.getRoomCategory(roomTypeId, category -> {
+            if (!"suite".equalsIgnoreCase(category)) {
+                return;
+            }
+            transferTile.setAlpha(1f);
+            lockBadge.setVisibility(View.GONE);
+            transferTile.setOnClickListener(view -> {
+                Intent intent = new Intent(this, TransferActivity.class);
+                intent.putExtra(TransferActivity.EXTRA_BOOKING_ID, activeBookingId);
+                startActivity(intent);
+            });
+        });
     }
 
     private String extractFirstName(String fullName) {

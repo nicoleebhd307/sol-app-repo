@@ -221,7 +221,7 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                                     R.string.checkout_booking_failed, Toast.LENGTH_LONG).show();
                             return;
                         }
-                        onBookingCreated(result.getBookingCode());
+                        onBookingCreated(result.getBookingId(), result.getBookingCode());
                     }
 
                     @Override
@@ -233,13 +233,34 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                 });
     }
 
-    private void onBookingCreated(String bookingCode) {
+    private void onBookingCreated(String bookingId, String bookingCode) {
         firebaseDatabaseDal.getCustomer(sessionManager.getCustomerId(), updatedCustomer -> {
             if (updatedCustomer != null) {
                 sessionManager.saveLoginSession(updatedCustomer, sessionManager.isRememberMeEnabled());
             }
-            showBookingConfirmedDialog(bookingCode);
+            // Suite guests get a complimentary airport transfer — offer it right after booking (optional).
+            if (roomType != null && "suite".equalsIgnoreCase(roomType.getCategory())) {
+                showSuiteTransferOffer(bookingId, bookingCode);
+            } else {
+                showBookingConfirmedDialog(bookingCode);
+            }
         });
+    }
+
+    private void showSuiteTransferOffer(String bookingId, String bookingCode) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.transfer_offer_title)
+                .setMessage(getString(R.string.transfer_offer_message))
+                .setCancelable(false)
+                .setPositiveButton(R.string.transfer_offer_yes, (dialog, which) -> {
+                    Intent intent = new Intent(this, TransferActivity.class);
+                    intent.putExtra(TransferActivity.EXTRA_BOOKING_ID, bookingId);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton(R.string.transfer_offer_no, (dialog, which) -> goToAccount())
+                .show();
     }
 
     private void showBookingConfirmedDialog(String bookingCode) {
@@ -247,12 +268,14 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                 .setTitle(R.string.checkout_success_title)
                 .setMessage(getString(R.string.checkout_success_message, bookingCode))
                 .setCancelable(false)
-                .setPositiveButton(R.string.checkout_success_action, (dialog, which) -> {
-                    Intent intent = new Intent(this, AccountActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    startActivity(intent);
-                    finish();
-                })
+                .setPositiveButton(R.string.checkout_success_action, (dialog, which) -> goToAccount())
                 .show();
+    }
+
+    private void goToAccount() {
+        Intent intent = new Intent(this, AccountActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }
