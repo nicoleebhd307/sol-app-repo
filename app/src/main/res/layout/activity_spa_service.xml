@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -34,9 +34,8 @@
 
                 <FrameLayout
                     android:id="@+id/btnSpaBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_circle_gold"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:contentDescription="@string/signup_back">
 
                     <ImageView
@@ -45,282 +44,26 @@
                         android:layout_gravity="center"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_arrowleft"
-                        app:tint="@color/white" />
+                        app:tint="@color/sol_gold_dark" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:letterSpacing="0.12"
-                    android:text="@string/spa_kicker"
-                    android:textColor="@color/sol_gold_dark"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_bell"
-                    app:tint="@color/sol_gold_dark" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:fontFamily="@font/cormorant_garamond"
-                android:text="@string/spa_title"
-                android:textColor="@color/sol_text_primary"
-                android:textSize="38sp"
-                android:textStyle="bold|italic" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter"
-                android:text="@string/spa_subtitle"
-                android:textColor="@color/sol_text_secondary"
-                android:textSize="14sp" />
-
-            <!-- Booking summary card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_dashboard_card"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/txtSpaRoomType"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
                     android:fontFamily="@font/cormorant_garamond"
-                    android:singleLine="true"
+                    android:text="@string/spa_title"
                     android:textColor="@color/sol_text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    tools:text="DELUXE SUITE" />
-
-                <TextView
-                    android:id="@+id/txtSpaBookingCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:textColor="@color/sol_text_secondary"
-                    android:textSize="13sp"
-                    tools:text="BK-2026-1045" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="14dp"
-                    android:background="@color/sol_border" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        style="@style/SpaFactCell">
-
-                        <ImageView
-                            style="@style/SpaFactIcon"
-                            android:src="@drawable/ic_calendar" />
-
-                        <TextView
-                            style="@style/SpaFactLabel"
-                            android:text="@string/home_check_in" />
-
-                        <TextView
-                            android:id="@+id/txtSpaCheckIn"
-                            style="@style/SpaFactValue"
-                            tools:text="14 Oct 2026" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/SpaFactCell">
-
-                        <ImageView
-                            style="@style/SpaFactIcon"
-                            android:src="@drawable/ic_calendar" />
-
-                        <TextView
-                            style="@style/SpaFactLabel"
-                            android:text="@string/home_check_out" />
-
-                        <TextView
-                            android:id="@+id/txtSpaCheckOut"
-                            style="@style/SpaFactValue"
-                            tools:text="15 Oct 2026" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/SpaFactCell">
-
-                        <ImageView
-                            style="@style/SpaFactIcon"
-                            android:src="@drawable/ic_profile" />
-
-                        <TextView
-                            style="@style/SpaFactLabel"
-                            android:text="@string/home_guests" />
-
-                        <TextView
-                            android:id="@+id/txtSpaGuests"
-                            style="@style/SpaFactValue"
-                            tools:text="2 Guests" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/SpaFactCell">
-
-                        <ImageView
-                            style="@style/SpaFactIcon"
-                            android:src="@drawable/ic_home" />
-
-                        <TextView
-                            style="@style/SpaFactLabel"
-                            android:text="@string/home_room" />
-
-                        <TextView
-                            android:id="@+id/txtSpaRoom"
-                            style="@style/SpaFactValue"
-                            tools:text="501" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Spa session card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_booking_selected"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        android:background="@drawable/bg_icon_soft">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_wellness"
-                            app:tint="@color/sol_gold_dark" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/cormorant_garamond"
-                            android:text="@string/spa_session_card_title"
-                            android:textColor="@color/sol_text_primary"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/txtSpaSessionDesc"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/inter"
-                            android:textColor="@color/sol_text_secondary"
-                            android:textSize="13sp"
-                            tools:text="40-minute spa session — pay per slot." />
-                    </LinearLayout>
-
-                    <FrameLayout
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/bg_circle_gold">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_check"
-                            app:tint="@color/white" />
-                    </FrameLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        style="@style/SpaInfoChip">
-
-                        <ImageView
-                            style="@style/SpaInfoChipIcon"
-                            android:src="@drawable/ic_card" />
-
-                        <TextView
-                            android:id="@+id/txtSpaPrice"
-                            style="@style/SpaInfoChipText"
-                            tools:text="350.000 ₫\n/ guest / session" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/SpaInfoChip">
-
-                        <ImageView
-                            style="@style/SpaInfoChipIcon"
-                            android:src="@drawable/ic_profile" />
-
-                        <TextView
-                            android:id="@+id/txtSpaSpecialists"
-                            style="@style/SpaInfoChipText"
-                            tools:text="10\nspa specialists" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/SpaInfoChip">
-
-                        <ImageView
-                            style="@style/SpaInfoChipIcon"
-                            android:src="@drawable/ic_calendar" />
-
-                        <TextView
-                            style="@style/SpaInfoChipText"
-                            android:text="@string/spa_sessions_multiple" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:textSize="30sp"
+                    android:textStyle="bold|italic" />
             </LinearLayout>
 
             <!-- Operating schedule -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/bg_dashboard_card"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -439,33 +182,124 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Info note -->
+            <!-- Preferred date -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/spa_preferred_date"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/chipDateContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
+            <!-- Morning sessions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/spa_morning_sessions"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="@string/spa_morning_hours"
+                android:textColor="@color/sol_gold_dark"
+                android:textSize="12sp" />
+
+            <GridLayout
+                android:id="@+id/gridMorning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:columnCount="2" />
+
+            <!-- Afternoon sessions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/spa_afternoon_sessions"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="@string/spa_afternoon_hours"
+                android:textColor="@color/sol_gold_dark"
+                android:textSize="12sp" />
+
+            <GridLayout
+                android:id="@+id/gridAfternoon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:columnCount="2" />
+
+            <!-- Summary: three evenly aligned figures -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/bg_amenity_item"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="14dp">
 
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/sol_gold_dark" />
-
                 <TextView
-                    android:id="@+id/txtSpaInfo"
+                    android:id="@+id/txtSummarySessions"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:fontFamily="@font/inter"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
                     android:textColor="@color/sol_text_secondary"
                     android:textSize="12sp"
-                    tools:text="@string/spa_info_paid" />
+                    tools:text="Sessions: 1" />
+
+                <TextView
+                    android:id="@+id/txtSummarySlots"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:textColor="@color/sol_text_secondary"
+                    android:textSize="12sp"
+                    tools:text="Slots: 1" />
+
+                <TextView
+                    android:id="@+id/txtEstimatedTotal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:textColor="@color/sol_gold_dark"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="700.000 ₫" />
             </LinearLayout>
 
             <TextView
@@ -484,13 +318,4 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
-
-    <include
-        android:id="@+id/bottomNavigation"
-        layout="@layout/layout_bottom_navigation"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

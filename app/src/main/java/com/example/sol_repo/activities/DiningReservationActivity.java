@@ -8,7 +8,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,9 +22,6 @@ import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.DiningTable;
 import com.example.sol_repo.models.OrderCreationResult;
-import com.example.sol_repo.utils.BottomNavHelper;
-import com.example.sol_repo.utils.ImageLoader;
-import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
@@ -76,7 +72,6 @@ public class DiningReservationActivity extends AppCompatActivity {
         smallGrid = findViewById(R.id.gridSmallTables);
         largeList = findViewById(R.id.listLargeTables);
 
-        BottomNavHelper.setup(this, BottomNavHelper.Tab.SERVICES);
         timeSlotText.setText(slotLabel(selectedSlot));
 
         findViewById(R.id.btnDiningBack).setOnClickListener(view -> finish());
@@ -90,26 +85,12 @@ public class DiningReservationActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            bindBookingCard(booking);
             initDate(booking);
             firebaseDatabaseDal.getDiningTables(loaded -> {
                 tables = loaded;
                 reloadAvailability();
             });
         });
-    }
-
-    private void bindBookingCard(BookingSummary booking) {
-        ((TextView) findViewById(R.id.txtDiningRoomType)).setText(
-                booking.getRoomTypeName().toUpperCase(Locale.US));
-        String room = booking.getRoomNumber();
-        ((TextView) findViewById(R.id.txtDiningRoomNumber)).setText(
-                getString(R.string.rs_room_label, room == null ? "" : room));
-        ((TextView) findViewById(R.id.txtDiningBookingCode)).setText(
-                getString(R.string.booking_id_label, booking.getBookingCode()));
-        ImageView image = findViewById(R.id.imgDiningRoom);
-        firebaseDatabaseDal.getRoomTypeImageUrl(booking.getRoomTypeId(), url ->
-                ImageLoader.load(image, url, RoomAssets.ROOM_PLACEHOLDER));
     }
 
     private void initDate(BookingSummary booking) {

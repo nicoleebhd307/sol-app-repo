@@ -2,34 +2,66 @@ package com.example.sol_repo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sol_repo.R;
+import com.example.sol_repo.dals.FirebaseCallback;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
-import com.example.sol_repo.utils.BottomNavHelper;
+import com.example.sol_repo.models.OrderCreationResult;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-/** Spa intro screen: shows the booking, the spa offer (free for Suite, paid otherwise) and rules. */
+/**
+ * Single-page spa registration: choose a stay date and one or more 40-minute sessions, then
+ * confirm (Suite = complimentary) or continue to payment (Deluxe and below). Each selected session
+ * uses one slot for one guest.
+ */
 public class SpaServiceActivity extends AppCompatActivity {
     public static final String EXTRA_BOOKING_ID = "booking_id";
 
+    /** Price per slot (one guest, one session) for non-Suite bookings. */
+    public static final double PRICE_PER_SLOT = 350_000d;
+
+    private static final String[] MORNING_SESSIONS = {
+            "08:00 – 08:40", "08:40 – 09:20", "09:20 – 10:00", "10:00 – 10:40"};
+    private static final String[] AFTERNOON_SESSIONS = {
+            "14:00 – 14:40", "14:40 – 15:20", "15:20 – 16:00"};
+
     private final SimpleDateFormat databaseDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     private final SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+    private final SimpleDateFormat chipDayFormat = new SimpleDateFormat("EEE", Locale.US);
+    private final SimpleDateFormat chipDateFormat = new SimpleDateFormat("dd MMM", Locale.US);
 
     private FirebaseDatabaseDal firebaseDatabaseDal;
     private SessionManager sessionManager;
     private String bookingId;
     private boolean free = false;
+
+    private final List<Calendar> stayDates = new ArrayList<>();
+    private int selectedDateIndex = 0;
+    private final Set<String> selectedSessions = new LinkedHashSet<>();
+    private Map<String, Integer> bookedBySession = new LinkedHashMap<>();
+    private final Map<String, View> sessionTiles = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +77,11 @@ public class SpaServiceActivity extends AppCompatActivity {
             return;
         }
 
-        BottomNavHelper.setup(this, BottomNavHelper.Tab.SERVICES);
-
-        ((TextView) findViewById(R.id.txtSpaSpecialists)).setText(
-                getString(R.string.spa_specialists, FirebaseDatabaseDal.SPA_SESSION_CAPACITY));
+        buildSessionTiles();
 
         findViewById(R.id.btnSpaBack).setOnClickListener(view -> finish());
-        findViewById(R.id.btnSpaContinue).setOnClickListener(view -> {
-            Intent intent = new Intent(this, SpaTimeActivity.class);
-            intent.putExtra(SpaTimeActivity.EXTRA_BOOKING_ID, bookingId);
-            intent.putExtra(SpaTimeActivity.EXTRA_FREE, free);
-            startActivity(intent);
-        });
+        findViewById(R.id.btnSpaContinue).setOnClickListener(view -> onContinue());
+        renderSummary();
 
         firebaseDatabaseDal.getBookingForCustomer(sessionManager.getCustomerId(), bookingId, booking -> {
             if (booking == null) {
@@ -64,52 +89,277 @@ public class SpaServiceActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            bindBookingCard(booking);
-            resolvePricing(booking);
+            buildStayDates(booking);
+            renderDateChips();
+            firebaseDatabaseDal.getRoomCategory(booking.getRoomTypeId(), category -> {
+                free = "suite".equalsIgnoreCase(category);
+                ((TextView) findViewById(R.id.btnSpaContinue)).setText(
+                        free ? R.string.spa_confirm_free_action : R.string.spa_continue);
+                renderSummary();
+            });
+            reloadAvailability();
         });
     }
 
-    private void bindBookingCard(BookingSummary booking) {
-        ((TextView) findViewById(R.id.txtSpaRoomType)).setText(
-                booking.getRoomTypeName().toUpperCase(Locale.US));
-        ((TextView) findViewById(R.id.txtSpaBookingCode)).setText(booking.getBookingCode());
-        ((TextView) findViewById(R.id.txtSpaCheckIn)).setText(formatDate(booking.getCheckInDate()));
-        ((TextView) findViewById(R.id.txtSpaCheckOut)).setText(formatDate(booking.getCheckOutDate()));
-        ((TextView) findViewById(R.id.txtSpaGuests)).setText(
-                getString(R.string.home_guest_count, booking.getNumGuests()));
-
-        TextView roomView = findViewById(R.id.txtSpaRoom);
-        String room = booking.getRoomNumber();
-        if (!TextUtils.isEmpty(room)) {
-            roomView.setText(room);
-        } else {
-            firebaseDatabaseDal.getRoomNumberForBooking(bookingId, number ->
-                    roomView.setText(TextUtils.isEmpty(number)
-                            ? getString(R.string.account_unknown_value) : number));
+    private void buildSessionTiles() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        GridLayout morning = findViewById(R.id.gridMorning);
+        GridLayout afternoon = findViewById(R.id.gridAfternoon);
+        for (String session : MORNING_SESSIONS) {
+            addSessionTile(inflater, morning, session);
+        }
+        for (String session : AFTERNOON_SESSIONS) {
+            addSessionTile(inflater, afternoon, session);
         }
     }
 
-    private void resolvePricing(BookingSummary booking) {
-        firebaseDatabaseDal.getRoomCategory(booking.getRoomTypeId(), category -> {
-            free = "suite".equalsIgnoreCase(category);
-            ((TextView) findViewById(R.id.txtSpaSessionDesc)).setText(
-                    free ? R.string.spa_session_desc_free : R.string.spa_session_desc_paid);
-            ((TextView) findViewById(R.id.txtSpaInfo)).setText(
-                    free ? R.string.spa_info_free : R.string.spa_info_paid);
-            if (free) {
-                ((TextView) findViewById(R.id.txtSpaPrice)).setText(R.string.spa_price_free);
-            } else {
-                ((TextView) findViewById(R.id.txtSpaPrice)).setText(getString(R.string.spa_price_per_slot,
-                        CurrencyFormatter.format(SpaTimeActivity.PRICE_PER_SLOT)));
+    private void addSessionTile(LayoutInflater inflater, GridLayout grid, String session) {
+        View tile = inflater.inflate(R.layout.item_spa_session, grid, false);
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+        params.width = 0;
+        params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+        params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+        int margin = dpToPx(4);
+        params.setMargins(margin, margin, margin, margin);
+        tile.setLayoutParams(params);
+        tile.setOnClickListener(view -> onSessionClicked(session));
+        sessionTiles.put(session, tile);
+        grid.addView(tile);
+    }
+
+    private void buildStayDates(BookingSummary booking) {
+        stayDates.clear();
+        Calendar start = parse(booking.getCheckInDate());
+        Calendar end = parse(booking.getCheckOutDate());
+        if (start == null) {
+            start = Calendar.getInstance();
+        }
+        if (end == null || end.before(start)) {
+            end = (Calendar) start.clone();
+        }
+        Calendar cursor = (Calendar) start.clone();
+        while (!cursor.after(end) && stayDates.size() < 60) {
+            stayDates.add((Calendar) cursor.clone());
+            cursor.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        selectedDateIndex = 0;
+    }
+
+    private void renderDateChips() {
+        LinearLayout container = findViewById(R.id.chipDateContainer);
+        container.removeAllViews();
+        Calendar today = Calendar.getInstance();
+        for (int i = 0; i < stayDates.size(); i++) {
+            Calendar date = stayDates.get(i);
+            boolean selected = i == selectedDateIndex;
+
+            LinearLayout chip = new LinearLayout(this);
+            chip.setOrientation(LinearLayout.VERTICAL);
+            chip.setGravity(Gravity.CENTER);
+            chip.setBackgroundResource(selected
+                    ? R.drawable.bg_spa_session_selected : R.drawable.bg_spa_session_available);
+            chip.setMinimumWidth(dpToPx(64));
+            chip.setPadding(dpToPx(14), dpToPx(10), dpToPx(14), dpToPx(10));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.rightMargin = dpToPx(10);
+            chip.setLayoutParams(lp);
+
+            TextView line1 = new TextView(this);
+            line1.setText(isSameDay(date, today) ? getString(R.string.spa_time_today_short)
+                    : chipDayFormat.format(date.getTime()));
+            line1.setTextColor(getColor(selected ? R.color.sol_gold_dark : R.color.sol_text_secondary));
+            line1.setTextSize(12f);
+            line1.setGravity(Gravity.CENTER);
+
+            TextView line2 = new TextView(this);
+            line2.setText(chipDateFormat.format(date.getTime()));
+            line2.setTextColor(getColor(R.color.sol_text_primary));
+            line2.setTextSize(14f);
+            line2.setGravity(Gravity.CENTER);
+
+            chip.addView(line1);
+            chip.addView(line2);
+            final int index = i;
+            chip.setOnClickListener(view -> {
+                if (selectedDateIndex != index) {
+                    selectedDateIndex = index;
+                    selectedSessions.clear();
+                    renderDateChips();
+                    reloadAvailability();
+                }
+            });
+            container.addView(chip);
+        }
+    }
+
+    private void reloadAvailability() {
+        if (stayDates.isEmpty()) {
+            return;
+        }
+        String date = databaseDateFormat.format(stayDates.get(selectedDateIndex).getTime());
+        firebaseDatabaseDal.getBookedSpaSlots(date, new FirebaseCallback<Map<String, Integer>>() {
+            @Override
+            public void onSuccess(Map<String, Integer> booked) {
+                bookedBySession = booked == null ? new LinkedHashMap<>() : booked;
+                renderSessions();
+                renderSummary();
+            }
+
+            @Override
+            public void onError(String message) {
+                bookedBySession = new LinkedHashMap<>();
+                renderSessions();
+                renderSummary();
             }
         });
     }
 
-    private String formatDate(String rawDate) {
-        try {
-            return displayDateFormat.format(databaseDateFormat.parse(rawDate));
-        } catch (ParseException | NullPointerException exception) {
-            return rawDate;
+    private int remainingFor(String session) {
+        Integer booked = bookedBySession.get(session);
+        return FirebaseDatabaseDal.SPA_SESSION_CAPACITY - (booked == null ? 0 : booked);
+    }
+
+    private void renderSessions() {
+        for (Map.Entry<String, View> entry : sessionTiles.entrySet()) {
+            String session = entry.getKey();
+            View tile = entry.getValue();
+            int remaining = remainingFor(session);
+            boolean selected = selectedSessions.contains(session);
+            boolean selectable = selected || remaining >= 1;
+
+            TextView time = tile.findViewById(R.id.txtSessionTime);
+            TextView left = tile.findViewById(R.id.txtSessionLeft);
+            View badge = tile.findViewById(R.id.badgeSelected);
+
+            time.setText(session);
+            left.setText(remaining <= 0
+                    ? getString(R.string.spa_slots_full)
+                    : getString(R.string.spa_slots_left, remaining));
+
+            if (selected) {
+                tile.setBackgroundResource(R.drawable.bg_spa_session_selected);
+                time.setTextColor(getColor(R.color.sol_text_primary));
+                left.setTextColor(getColor(R.color.sol_gold_dark));
+                badge.setVisibility(View.VISIBLE);
+            } else if (selectable) {
+                tile.setBackgroundResource(R.drawable.bg_spa_session_available);
+                time.setTextColor(getColor(R.color.sol_text_primary));
+                left.setTextColor(getColor(R.color.sol_text_secondary));
+                badge.setVisibility(View.INVISIBLE);
+            } else {
+                tile.setBackgroundResource(R.drawable.bg_spa_session_full);
+                time.setTextColor(getColor(R.color.sol_text_secondary));
+                left.setTextColor(getColor(R.color.sol_text_secondary));
+                badge.setVisibility(View.INVISIBLE);
+            }
         }
+    }
+
+    private void onSessionClicked(String session) {
+        if (selectedSessions.contains(session)) {
+            selectedSessions.remove(session);
+        } else if (remainingFor(session) >= 1) {
+            selectedSessions.add(session);
+        } else {
+            Toast.makeText(this, getString(R.string.spa_error_capacity, 1),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        renderSessions();
+        renderSummary();
+    }
+
+    private void renderSummary() {
+        // One slot per selected session (one guest each).
+        int sessionCount = selectedSessions.size();
+        int slots = sessionCount;
+        double total = free ? 0 : slots * PRICE_PER_SLOT;
+
+        ((TextView) findViewById(R.id.txtSummarySessions)).setText(
+                getString(R.string.spa_summary_sessions_short, sessionCount));
+        ((TextView) findViewById(R.id.txtSummarySlots)).setText(
+                getString(R.string.spa_summary_slots_short, slots));
+        ((TextView) findViewById(R.id.txtEstimatedTotal)).setText(
+                free ? getString(R.string.spa_amount_free) : CurrencyFormatter.format(total));
+    }
+
+    private void onContinue() {
+        if (selectedSessions.isEmpty()) {
+            Toast.makeText(this, R.string.spa_error_pick, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (String session : selectedSessions) {
+            if (remainingFor(session) < 1) {
+                Toast.makeText(this, getString(R.string.spa_error_capacity, 1),
+                        Toast.LENGTH_LONG).show();
+                reloadAvailability();
+                return;
+            }
+        }
+
+        ArrayList<String> sessions = new ArrayList<>(selectedSessions);
+        int slots = sessions.size();
+        String dbDate = databaseDateFormat.format(stayDates.get(selectedDateIndex).getTime());
+        String displayDate = displayDateFormat.format(stayDates.get(selectedDateIndex).getTime());
+
+        if (free) {
+            View button = findViewById(R.id.btnSpaContinue);
+            button.setEnabled(false);
+            firebaseDatabaseDal.createSpaBooking(bookingId, sessionManager.getCustomerId(), dbDate,
+                    sessions, 1, slots, 0, 0, true, null,
+                    new FirebaseCallback<OrderCreationResult>() {
+                        @Override
+                        public void onSuccess(OrderCreationResult result) {
+                            button.setEnabled(true);
+                            if (result == null) {
+                                Toast.makeText(SpaServiceActivity.this, R.string.spa_booking_failed,
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            startActivity(SpaConfirmActivity.intentFor(SpaServiceActivity.this, bookingId,
+                                    result.getOrderCode(), displayDate, 1, sessions, slots, 0, true));
+                            finish();
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            button.setEnabled(true);
+                            Toast.makeText(SpaServiceActivity.this, R.string.spa_booking_failed,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+            return;
+        }
+
+        Intent intent = new Intent(this, SpaPaymentActivity.class);
+        intent.putExtra(SpaPaymentActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.putExtra(SpaPaymentActivity.EXTRA_DATE_DB, dbDate);
+        intent.putExtra(SpaPaymentActivity.EXTRA_DATE_DISPLAY, displayDate);
+        intent.putStringArrayListExtra(SpaPaymentActivity.EXTRA_SESSIONS, sessions);
+        intent.putExtra(SpaPaymentActivity.EXTRA_GUESTS, 1);
+        intent.putExtra(SpaPaymentActivity.EXTRA_SLOTS, slots);
+        intent.putExtra(SpaPaymentActivity.EXTRA_PRICE_PER_SLOT, PRICE_PER_SLOT);
+        intent.putExtra(SpaPaymentActivity.EXTRA_TOTAL, slots * PRICE_PER_SLOT);
+        startActivity(intent);
+    }
+
+    private boolean isSameDay(Calendar a, Calendar b) {
+        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR)
+                && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private Calendar parse(String rawDate) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(databaseDateFormat.parse(rawDate));
+            return calendar;
+        } catch (ParseException | NullPointerException exception) {
+            return null;
+        }
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 }
