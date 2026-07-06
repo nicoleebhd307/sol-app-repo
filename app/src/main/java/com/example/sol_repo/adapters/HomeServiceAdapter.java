@@ -51,6 +51,12 @@ public class HomeServiceAdapter {
         if ("restaurant".equals(iconType)) {
             return R.drawable.ic_restaurant;
         }
+        if ("roomservice".equals(iconType)) {
+            return R.drawable.ic_roomservice;
+        }
+        if ("souvenir".equals(iconType)) {
+            return R.drawable.ic_bag;
+        }
         return R.drawable.ic_service;
     }
 

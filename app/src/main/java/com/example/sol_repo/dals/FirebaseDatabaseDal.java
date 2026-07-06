@@ -219,17 +219,73 @@ public class FirebaseDatabaseDal {
 
     // ===================== Home dashboard =====================
 
+    /**
+     * Lists every service tied to a booking for the home "My Services" section: indexed
+     * reservations (dining / transfer / wellness), room service orders and souvenir orders.
+     * No cap is applied — the full set for {@code bookingId} is returned.
+     */
     public void getHomeServices(String bookingId, FirebaseCallback<List<HomeServiceItem>> callback) {
         readOnce(rootRef.child("servicesByBooking").child(bookingId), indexSnapshot -> {
             List<DataSnapshot> entries = new ArrayList<>();
             for (DataSnapshot entry : indexSnapshot.getChildren()) {
                 entries.add(entry);
-                if (entries.size() >= 3) {
-                    break;
-                }
             }
-            resolveHomeServicesSequentially(entries, 0, new ArrayList<>(), callback::onSuccess);
+            resolveHomeServicesSequentially(entries, 0, new ArrayList<>(), indexedServices ->
+                    appendRoomServiceOrders(bookingId, indexedServices, withRoomService ->
+                            appendStoreOrders(bookingId, withRoomService, callback::onSuccess)));
         }, callback::onError);
+    }
+
+    /** Appends each room service order for the booking as a "Room Service" entry. */
+    private void appendRoomServiceOrders(String bookingId, List<HomeServiceItem> accumulated,
+                                         ValueListener<List<HomeServiceItem>> onDone) {
+        readOnce(rootRef.child("ordersByBooking").child(bookingId), indexSnapshot -> {
+            List<String> orderIds = childKeys(indexSnapshot);
+            if (orderIds.isEmpty()) {
+                onDone.onValue(accumulated);
+                return;
+            }
+            AtomicCountdown countdown = new AtomicCountdown(orderIds.size(),
+                    () -> onDone.onValue(accumulated));
+            for (String orderId : orderIds) {
+                readOnce(rootRef.child("roomServiceOrders").child(orderId), snapshot -> {
+                    if (snapshot.exists()) {
+                        accumulated.add(new HomeServiceItem(
+                                "Room Service",
+                                snapshot.child("orderCode").getValue(String.class),
+                                snapshot.child("status").getValue(String.class),
+                                "roomservice"));
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, error -> onDone.onValue(accumulated));
+    }
+
+    /** Appends each souvenir store order for the booking as a "Souvenirs" entry. */
+    private void appendStoreOrders(String bookingId, List<HomeServiceItem> accumulated,
+                                   ValueListener<List<HomeServiceItem>> onDone) {
+        readOnce(rootRef.child("storeOrdersByBooking").child(bookingId), indexSnapshot -> {
+            List<String> orderIds = childKeys(indexSnapshot);
+            if (orderIds.isEmpty()) {
+                onDone.onValue(accumulated);
+                return;
+            }
+            AtomicCountdown countdown = new AtomicCountdown(orderIds.size(),
+                    () -> onDone.onValue(accumulated));
+            for (String orderId : orderIds) {
+                readOnce(rootRef.child("storeOrders").child(orderId), snapshot -> {
+                    if (snapshot.exists()) {
+                        accumulated.add(new HomeServiceItem(
+                                "Souvenirs",
+                                snapshot.child("orderCode").getValue(String.class),
+                                snapshot.child("status").getValue(String.class),
+                                "souvenir"));
+                    }
+                    countdown.tick();
+                }, error -> countdown.tick());
+            }
+        }, error -> onDone.onValue(accumulated));
     }
 
     private void resolveHomeServicesSequentially(List<DataSnapshot> entries, int index,
