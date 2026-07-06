@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login_root"
+    android:fillViewport="true"
+    tools:context=".activities.SpaConfirmActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:id="@+id/btnSpaConfirmBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="start|center_vertical"
+                android:contentDescription="@string/signup_back">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_arrowleft" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:contentDescription="@string/logo_content_description"
+                    android:src="@drawable/sol_logo"
+                    app:tint="@color/sol_gold_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/cormorant_garamond"
+                    android:letterSpacing="0.2"
+                    android:text="@string/brand_name"
+                    android:textColor="@color/sol_text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_icon_soft">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_check"
+                app:tint="@color/sol_gold" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/cormorant_garamond"
+            android:gravity="center"
+            android:text="@string/spa_confirm_title"
+            android:textColor="@color/sol_text_primary"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/spa_confirm_subtitle"
+            android:textColor="@color/sol_text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Details card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_dashboard_card"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_gift" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_booking_id" />
+
+                <TextView
+                    android:id="@+id/txtConfirmBookingId"
+                    style="@style/SpaDetailValue"
+                    tools:text="SPA-2026-1001" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_wellness" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_service" />
+
+                <TextView
+                    style="@style/SpaDetailValue"
+                    android:text="@string/spa_session_card_title" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_calendar" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_date" />
+
+                <TextView
+                    android:id="@+id/txtConfirmDate"
+                    style="@style/SpaDetailValue"
+                    tools:text="15 Oct 2026" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_profile" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_guests" />
+
+                <TextView
+                    android:id="@+id/txtConfirmGuests"
+                    style="@style/SpaDetailValue"
+                    tools:text="2 Guests" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_clock" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_session" />
+
+                <TextView
+                    android:id="@+id/txtConfirmSession"
+                    style="@style/SpaDetailValue"
+                    tools:text="09:20 – 10:00" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_clock" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_length" />
+
+                <TextView
+                    style="@style/SpaDetailValue"
+                    android:text="@string/spa_confirm_length_value" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_profile" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_slots" />
+
+                <TextView
+                    android:id="@+id/txtConfirmSlots"
+                    style="@style/SpaDetailValue"
+                    tools:text="2" />
+            </LinearLayout>
+
+            <View style="@style/SpaDetailDivider" />
+
+            <LinearLayout style="@style/SpaDetailRow">
+
+                <ImageView
+                    style="@style/SpaDetailIcon"
+                    android:src="@drawable/ic_card" />
+
+                <TextView
+                    style="@style/SpaDetailLabel"
+                    android:text="@string/spa_confirm_amount" />
+
+                <TextView
+                    android:id="@+id/txtConfirmAmount"
+                    style="@style/SpaDetailValue"
+                    tools:text="700.000 ₫" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Arrival reminder -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_amenity_item"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_info"
+                app:tint="@color/sol_gold_dark" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="@string/spa_arrival_title"
+                    android:textColor="@color/sol_text_primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter"
+                    android:text="@string/spa_arrival_desc"
+                    android:textColor="@color/sol_text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnSpaConcierge"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_gold_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/cormorant_garamond"
+            android:gravity="center"
+            android:text="@string/spa_contact_concierge"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnSpaBackHome"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_outline_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/cormorant_garamond"
+            android:gravity="center"
+            android:text="@string/store_back_home"
+            android:textColor="@color/sol_gold_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

@@ -387,4 +387,72 @@
     <string name="rs_message_desk">Message front desk\nWe\'re here to help</string>
     <string name="rs_view_order_details">VIEW ORDER DETAILS  →</string>
     <string name="rs_quantity_times">× %1$d</string>
+
+    <!-- Spa service -->
+    <string name="spa_kicker">SPA &amp; WELLNESS</string>
+    <string name="spa_title">Spa Service</string>
+    <string name="spa_subtitle">Book 40-minute spa sessions for your stay.</string>
+    <string name="spa_session_card_title">Spa Session Booking</string>
+    <string name="spa_session_desc_paid">40-minute spa session — pay per slot.</string>
+    <string name="spa_session_desc_free">Complimentary 40-minute spa sessions for Suite guests.</string>
+    <string name="spa_price_per_slot">%1$s\n/ guest / session</string>
+    <string name="spa_price_free">Free\nfor Suite guests</string>
+    <string name="spa_specialists">%1$d\nspa specialists</string>
+    <string name="spa_sessions_multiple">Multiple\nsessions allowed</string>
+    <string name="spa_schedule_title">Operating Schedule</string>
+    <string name="spa_operating_hours">Operating hours: 08:00 – 21:00</string>
+    <string name="spa_morning_team">Morning team:</string>
+    <string name="spa_morning_hours">08:00 – 15:00</string>
+    <string name="spa_afternoon_team">Afternoon team:</string>
+    <string name="spa_afternoon_hours">14:00 – 21:00</string>
+    <string name="spa_info_paid">Spa access is available for your booking. You may reserve one or more session slots; pricing increases by the number of guests and selected sessions.</string>
+    <string name="spa_info_free">As a Suite guest, spa sessions are complimentary. Reserve one or more sessions for your stay.</string>
+    <string name="spa_continue">Continue</string>
+
+    <string name="spa_time_title">Choose Time</string>
+    <string name="spa_time_subtitle">Select one or more available 40-minute spa sessions.</string>
+    <string name="spa_preferred_date">Preferred Date</string>
+    <string name="spa_time_today_short">Today</string>
+    <string name="spa_guests_using">Guests Using Spa</string>
+    <string name="spa_morning_sessions">Available Morning Sessions</string>
+    <string name="spa_afternoon_sessions">Available Afternoon Sessions</string>
+    <string name="spa_slots_left">%1$d left</string>
+    <string name="spa_slots_full">Full</string>
+    <string name="spa_summary_sessions">Selected sessions: %1$d</string>
+    <string name="spa_summary_guests">Guests using spa: %1$d</string>
+    <string name="spa_summary_slots">Slots used: %1$d</string>
+    <string name="spa_estimated_total">Estimated total:</string>
+    <string name="spa_time_note">A slot equals one guest in one 40-minute session. Two guests at the same time use 2 slots.</string>
+    <string name="spa_error_pick">Please select at least one session.</string>
+    <string name="spa_error_capacity">Not enough capacity for %1$d guests in one of the selected sessions.</string>
+    <string name="spa_confirm_free_action">Confirm Booking</string>
+
+    <string name="spa_payment_title">Payment</string>
+    <string name="spa_payment_subtitle">Complete your spa booking.</string>
+    <string name="spa_pay_service">SERVICE</string>
+    <string name="spa_pay_date">DATE</string>
+    <string name="spa_pay_guests">GUESTS USING SPA</string>
+    <string name="spa_pay_sessions">SELECTED SESSIONS</string>
+    <string name="spa_pay_slot">SELECTED SLOTS</string>
+    <string name="spa_pay_total">TOTAL</string>
+    <string name="spa_pay_note">Your spa reservation will be confirmed once payment is completed.</string>
+    <string name="spa_confirm_pay">Confirm &amp; Pay</string>
+    <string name="spa_booking_failed">Could not complete the spa booking. Please try again.</string>
+
+    <string name="spa_confirm_title">Spa Booking Confirmed</string>
+    <string name="spa_confirm_subtitle">Your spa session has been reserved successfully.</string>
+    <string name="spa_confirm_booking_id">Booking ID</string>
+    <string name="spa_confirm_service">Service</string>
+    <string name="spa_confirm_date">Date</string>
+    <string name="spa_confirm_guests">Guests Using Spa</string>
+    <string name="spa_confirm_session">Selected Session</string>
+    <string name="spa_confirm_length">Session Length</string>
+    <string name="spa_confirm_length_value">40 min</string>
+    <string name="spa_confirm_slots">Slots Used</string>
+    <string name="spa_confirm_amount">Amount Paid</string>
+    <string name="spa_amount_free">Complimentary</string>
+    <string name="spa_arrival_title">Arrival Reminder</string>
+    <string name="spa_arrival_desc">Please arrive 10 minutes before your booked session time.</string>
+    <string name="spa_contact_concierge">Contact Concierge</string>
+    <string name="spa_sessions_plus">%1$s +%2$d more</string>
 </resources>

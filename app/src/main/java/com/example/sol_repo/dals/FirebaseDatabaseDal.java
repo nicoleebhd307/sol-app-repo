@@ -40,6 +40,10 @@ public class FirebaseDatabaseDal {
     private static final long CUSTOMER_ID_SEED = 3L;
     private static final long STORE_ORDER_SEED = 122L;
     private static final long DINING_RES_SEED = 1200L;
+    private static final long SPA_BOOKING_SEED = 1000L;
+
+    /** Number of spa specialists on staff — the per-session slot capacity. */
+    public static final int SPA_SESSION_CAPACITY = 10;
 
     private final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -342,9 +346,30 @@ public class FirebaseDatabaseDal {
                     next.run();
                 }, error -> next.run());
             }, error -> next.run());
+        } else if ("spa".equals(type)) {
+            readOnce(rootRef.child("spaBookings").child(refId), snapshot -> {
+                if (snapshot.exists()) {
+                    accumulated.add(new HomeServiceItem(
+                            snapshot.child("serviceName").getValue(String.class),
+                            snapshot.child("reservationDate").getValue(String.class) + " "
+                                    + firstSpaSession(snapshot),
+                            snapshot.child("status").getValue(String.class),
+                            "wellness"));
+                }
+                next.run();
+            }, error -> next.run());
         } else {
             next.run();
         }
+    }
+
+    /** Reads the first (earliest) session label from a spa booking snapshot, or "" if none. */
+    private String firstSpaSession(DataSnapshot spaSnapshot) {
+        for (DataSnapshot session : spaSnapshot.child("sessions").getChildren()) {
+            String label = session.getValue(String.class);
+            return label == null ? "" : label;
+        }
+        return "";
     }
 
     public void getRecommendations(FirebaseCallback<List<RecommendationItem>> callback) {
@@ -863,6 +888,115 @@ public class FirebaseDatabaseDal {
                 });
             }, callback::onError);
         });
+    }
+
+    // ===================== Spa / wellness =====================
+
+    /**
+     * Reads a room type's category ("suite", "deluxe", ...) so the spa flow can tell whether
+     * the guest gets free access (Suite) or pays per slot (Deluxe and below).
+     */
+    public void getRoomCategory(String roomTypeId, FirebaseCallback<String> callback) {
+        if (roomTypeId == null) {
+            callback.onSuccess("");
+            return;
+        }
+        readOnce(rootRef.child("roomTypes").child(roomTypeId).child("category"), snapshot -> {
+            String category = snapshot.getValue(String.class);
+            callback.onSuccess(category == null ? "" : category);
+        }, callback::onError);
+    }
+
+    /**
+     * Returns how many spa slots are already taken per session on a given date, hotel-wide.
+     * A session's remaining capacity is {@link #SPA_SESSION_CAPACITY} minus its returned count.
+     */
+    public void getBookedSpaSlots(String date, FirebaseCallback<Map<String, Integer>> callback) {
+        readOnce(rootRef.child("spaBookings"), snapshot -> {
+            Map<String, Integer> bookedBySession = new HashMap<>();
+            for (DataSnapshot booking : snapshot.getChildren()) {
+                String status = booking.child("status").getValue(String.class);
+                if (!"pending".equals(status) && !"confirmed".equals(status) && !"completed".equals(status)) {
+                    continue;
+                }
+                if (!date.equals(booking.child("reservationDate").getValue(String.class))) {
+                    continue;
+                }
+                int guests = valueOrZeroInt(booking.child("numGuests"));
+                for (DataSnapshot session : booking.child("sessions").getChildren()) {
+                    String slot = session.getValue(String.class);
+                    if (slot != null) {
+                        bookedBySession.merge(slot, guests, Integer::sum);
+                    }
+                }
+            }
+            callback.onSuccess(bookedBySession);
+        }, callback::onError);
+    }
+
+    /**
+     * Books one or more spa sessions for a booking. Suite guests pay nothing (free); other tiers
+     * are charged {@code totalAmount} and a payment record is written. Also indexes the booking
+     * under the home "My Services" list.
+     */
+    public void createSpaBooking(String bookingId, String customerId, String date, List<String> sessions,
+                                 int numGuests, int slotsUsed, double pricePerSlot, double totalAmount,
+                                 boolean free, String paymentMethod,
+                                 FirebaseCallback<OrderCreationResult> callback) {
+        nextSequence("spaBooking", SPA_BOOKING_SEED, sequence -> {
+            String spaBookingId = rootRef.child("spaBookings").push().getKey();
+            String bookingCode = String.format(Locale.US, "SPA-2026-%04d", sequence);
+            String now = currentTimestamp();
+
+            Map<String, Object> spaBooking = new HashMap<>();
+            spaBooking.put("bookingCode", bookingCode);
+            spaBooking.put("bookingId", bookingId);
+            spaBooking.put("customerId", customerId);
+            spaBooking.put("serviceName", "Spa Session Booking");
+            spaBooking.put("reservationDate", date);
+            spaBooking.put("sessions", new ArrayList<>(sessions));
+            spaBooking.put("numGuests", numGuests);
+            spaBooking.put("slotsUsed", slotsUsed);
+            spaBooking.put("sessionLengthMinutes", 40);
+            spaBooking.put("pricePerSlot", pricePerSlot);
+            spaBooking.put("totalAmount", totalAmount);
+            spaBooking.put("free", free);
+            spaBooking.put("paymentMethod", free ? "complimentary" : paymentMethod);
+            spaBooking.put("status", "confirmed");
+            spaBooking.put("createdAt", now);
+
+            Map<String, Object> serviceIndex = new HashMap<>();
+            serviceIndex.put("type", "spa");
+            serviceIndex.put("refId", spaBookingId);
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("/spaBookings/" + spaBookingId, spaBooking);
+            updates.put("/spaBookingsByBooking/" + bookingId + "/" + spaBookingId, true);
+            updates.put("/servicesByBooking/" + bookingId + "/spa_" + spaBookingId, serviceIndex);
+
+            if (!free) {
+                String paymentId = rootRef.child("payments").push().getKey();
+                Map<String, Object> payment = new HashMap<>();
+                payment.put("bookingId", bookingId);
+                payment.put("customerId", customerId);
+                payment.put("amount", totalAmount);
+                payment.put("paymentMethod", paymentMethod);
+                payment.put("paymentType", "spa");
+                payment.put("status", "success");
+                payment.put("paidAt", now);
+                payment.put("createdAt", now);
+                updates.put("/payments/" + paymentId, payment);
+                updates.put("/paymentsByBooking/" + bookingId + "/" + paymentId, true);
+            }
+
+            rootRef.updateChildren(updates, (error, ref) -> {
+                if (error != null) {
+                    callback.onError(error.getMessage());
+                } else {
+                    callback.onSuccess(new OrderCreationResult(spaBookingId, bookingCode));
+                }
+            });
+        }, callback::onError);
     }
 
     // ===================== Internal chaining helpers =====================

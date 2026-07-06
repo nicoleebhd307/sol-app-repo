@@ -116,9 +116,14 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        findViewById(R.id.tileSpa).setOnClickListener(view -> {
+            Intent intent = new Intent(this, SpaServiceActivity.class);
+            intent.putExtra(SpaServiceActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
+
         View.OnClickListener comingSoon = view ->
                 Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
-        findViewById(R.id.tileSpa).setOnClickListener(comingSoon);
         findViewById(R.id.tileTransport).setOnClickListener(comingSoon);
         findViewById(R.id.tileMore).setOnClickListener(comingSoon);
     }

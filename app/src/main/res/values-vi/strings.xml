@@ -269,4 +269,72 @@
     <string name="details_error_phone">Vui lòng nhập số điện thoại</string>
     <string name="details_error_dob">Vui lòng chọn ngày sinh</string>
     <string name="details_error_nationality">Vui lòng nhập quốc tịch</string>
+
+    <!-- Spa service -->
+    <string name="spa_kicker">SPA &amp; THƯ GIÃN</string>
+    <string name="spa_title">Dịch vụ Spa</string>
+    <string name="spa_subtitle">Đặt các buổi spa 40 phút cho kỳ nghỉ của bạn.</string>
+    <string name="spa_session_card_title">Đặt buổi Spa</string>
+    <string name="spa_session_desc_paid">Buổi spa 40 phút — trả theo từng lượt.</string>
+    <string name="spa_session_desc_free">Miễn phí các buổi spa 40 phút cho khách hạng Suite.</string>
+    <string name="spa_price_per_slot">%1$s\n/ khách / buổi</string>
+    <string name="spa_price_free">Miễn phí\ncho khách Suite</string>
+    <string name="spa_specialists">%1$d\nchuyên viên spa</string>
+    <string name="spa_sessions_multiple">Được chọn\nnhiều buổi</string>
+    <string name="spa_schedule_title">Lịch hoạt động</string>
+    <string name="spa_operating_hours">Giờ hoạt động: 08:00 – 21:00</string>
+    <string name="spa_morning_team">Ca sáng:</string>
+    <string name="spa_morning_hours">08:00 – 15:00</string>
+    <string name="spa_afternoon_team">Ca chiều:</string>
+    <string name="spa_afternoon_hours">14:00 – 21:00</string>
+    <string name="spa_info_paid">Dịch vụ spa khả dụng cho đặt phòng của bạn. Bạn có thể đặt một hoặc nhiều buổi; chi phí tăng theo số khách và số buổi đã chọn.</string>
+    <string name="spa_info_free">Là khách hạng Suite, các buổi spa được miễn phí. Hãy đặt một hoặc nhiều buổi cho kỳ nghỉ.</string>
+    <string name="spa_continue">Tiếp tục</string>
+
+    <string name="spa_time_title">Chọn giờ</string>
+    <string name="spa_time_subtitle">Chọn một hoặc nhiều buổi spa 40 phút còn trống.</string>
+    <string name="spa_preferred_date">Ngày mong muốn</string>
+    <string name="spa_time_today_short">Hôm nay</string>
+    <string name="spa_guests_using">Số khách dùng spa</string>
+    <string name="spa_morning_sessions">Buổi sáng còn trống</string>
+    <string name="spa_afternoon_sessions">Buổi chiều còn trống</string>
+    <string name="spa_slots_left">còn %1$d</string>
+    <string name="spa_slots_full">Hết chỗ</string>
+    <string name="spa_summary_sessions">Buổi đã chọn: %1$d</string>
+    <string name="spa_summary_guests">Khách dùng spa: %1$d</string>
+    <string name="spa_summary_slots">Lượt sử dụng: %1$d</string>
+    <string name="spa_estimated_total">Tạm tính:</string>
+    <string name="spa_time_note">Một lượt tương ứng một khách trong một buổi 40 phút. Hai khách cùng giờ dùng 2 lượt.</string>
+    <string name="spa_error_pick">Vui lòng chọn ít nhất một buổi.</string>
+    <string name="spa_error_capacity">Không đủ chỗ cho %1$d khách trong một buổi đã chọn.</string>
+    <string name="spa_confirm_free_action">Xác nhận đặt</string>
+
+    <string name="spa_payment_title">Thanh toán</string>
+    <string name="spa_payment_subtitle">Hoàn tất đặt spa của bạn.</string>
+    <string name="spa_pay_service">DỊCH VỤ</string>
+    <string name="spa_pay_date">NGÀY</string>
+    <string name="spa_pay_guests">SỐ KHÁCH DÙNG SPA</string>
+    <string name="spa_pay_sessions">SỐ BUỔI ĐÃ CHỌN</string>
+    <string name="spa_pay_slot">CÁC BUỔI ĐÃ CHỌN</string>
+    <string name="spa_pay_total">TỔNG</string>
+    <string name="spa_pay_note">Đặt spa sẽ được xác nhận sau khi thanh toán hoàn tất.</string>
+    <string name="spa_confirm_pay">Xác nhận &amp; Thanh toán</string>
+    <string name="spa_booking_failed">Không thể hoàn tất đặt spa. Vui lòng thử lại.</string>
+
+    <string name="spa_confirm_title">Đã xác nhận đặt Spa</string>
+    <string name="spa_confirm_subtitle">Buổi spa của bạn đã được đặt thành công.</string>
+    <string name="spa_confirm_booking_id">Mã đặt</string>
+    <string name="spa_confirm_service">Dịch vụ</string>
+    <string name="spa_confirm_date">Ngày</string>
+    <string name="spa_confirm_guests">Số khách dùng spa</string>
+    <string name="spa_confirm_session">Buổi đã chọn</string>
+    <string name="spa_confirm_length">Thời lượng buổi</string>
+    <string name="spa_confirm_length_value">40 phút</string>
+    <string name="spa_confirm_slots">Lượt sử dụng</string>
+    <string name="spa_confirm_amount">Số tiền đã trả</string>
+    <string name="spa_amount_free">Miễn phí</string>
+    <string name="spa_arrival_title">Nhắc nhở đến sớm</string>
+    <string name="spa_arrival_desc">Vui lòng đến trước giờ buổi spa 10 phút.</string>
+    <string name="spa_contact_concierge">Liên hệ Lễ tân</string>
+    <string name="spa_sessions_plus">%1$s +%2$d buổi</string>
 </resources>

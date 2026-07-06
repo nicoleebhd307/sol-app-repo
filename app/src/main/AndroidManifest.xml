@@ -59,6 +59,18 @@
         <activity
             android:name=".activities.DiningReservationActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.SpaServiceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SpaTimeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SpaPaymentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SpaConfirmActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activities.LoginActivity"

@@ -9,7 +9,6 @@ public class BookingSummary {
     private String checkOutDate;
     private int numGuests;
     private String status;
-    private String roomTypeId;
     private String roomNumber;
 
     public BookingSummary() {
@@ -88,14 +87,6 @@ public class BookingSummary {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getRoomTypeId() {
-        return roomTypeId;
-    }
-
-    public void setRoomTypeId(String roomTypeId) {
-        this.roomTypeId = roomTypeId;
     }
 
     public String getRoomNumber() {
