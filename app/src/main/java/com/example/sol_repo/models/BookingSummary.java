@@ -4,6 +4,7 @@ public class BookingSummary {
     private String bookingId;
     private String bookingCode;
     private String roomTypeName;
+    private String roomTypeId;
     private String checkInDate;
     private String checkOutDate;
     private int numGuests;
@@ -45,6 +46,14 @@ public class BookingSummary {
 
     public void setRoomTypeName(String roomTypeName) {
         this.roomTypeName = roomTypeName;
+    }
+
+    public String getRoomTypeId() {
+        return roomTypeId;
+    }
+
+    public void setRoomTypeId(String roomTypeId) {
+        this.roomTypeId = roomTypeId;
     }
 
     public String getCheckInDate() {

@@ -19,6 +19,7 @@ import com.example.sol_repo.models.RoomType;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.ImageLoader;
 import com.example.sol_repo.utils.RoomAssets;
+import com.example.sol_repo.utils.SessionManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -53,7 +54,6 @@ public class RoomBookingActivity extends AppCompatActivity {
     private int filterMinPrice = 0;
     private int filterMaxPrice = PRICE_SLIDER_MAX;
     private final Set<String> filterViews = new HashSet<>();
-    private int filterMinGuests = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,8 @@ public class RoomBookingActivity extends AppCompatActivity {
         checkInCalendar.add(Calendar.DAY_OF_MONTH, 7);
         checkOutCalendar.add(Calendar.DAY_OF_MONTH, 13);
 
+        findViewById(R.id.btnBookingBack).setOnClickListener(view -> goHome());
+        findViewById(R.id.btnBookingProfile).setOnClickListener(view -> goProfile());
         findViewById(R.id.cardDateSearch).setOnClickListener(view -> pickCheckInDate());
         findViewById(R.id.btnSearchRooms).setOnClickListener(view -> loadRooms());
         findViewById(R.id.btnOpenFilter).setOnClickListener(view -> showFilterSheet());
@@ -78,6 +80,27 @@ public class RoomBookingActivity extends AppCompatActivity {
 
         renderDateRange();
         loadRooms();
+    }
+
+    /** Back arrow returns to the home dashboard for the active stay. */
+    private void goHome() {
+        String bookingId = new SessionManager(this).getSelectedBookingId();
+        if (bookingId == null) {
+            finish();
+            return;
+        }
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    /** Profile icon navigates to the account screen. */
+    private void goProfile() {
+        Intent intent = new Intent(this, AccountActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void pickCheckInDate() {
@@ -136,12 +159,6 @@ public class RoomBookingActivity extends AppCompatActivity {
         }
         if (!filterViews.isEmpty() && !filterViews.contains(roomType.getViewType())) {
             return false;
-        }
-        if (filterMinGuests > 0) {
-            if (filterMinGuests >= 4) {
-                return roomType.getMaxOccupancy() >= 4;
-            }
-            return roomType.getMaxOccupancy() >= filterMinGuests;
         }
         return true;
     }
@@ -203,9 +220,7 @@ public class RoomBookingActivity extends AppCompatActivity {
         TextView chipViewOcean = sheetView.findViewById(R.id.chipViewOcean);
         TextView chipViewGarden = sheetView.findViewById(R.id.chipViewGarden);
         TextView chipViewPool = sheetView.findViewById(R.id.chipViewPool);
-        TextView chipGuests2 = sheetView.findViewById(R.id.chipGuests2);
-        TextView chipGuests3 = sheetView.findViewById(R.id.chipGuests3);
-        TextView chipGuests4 = sheetView.findViewById(R.id.chipGuests4);
+        TextView chipViewStreet = sheetView.findViewById(R.id.chipViewStreet);
         TextView minPriceTextView = sheetView.findViewById(R.id.txtMinPrice);
         TextView maxPriceTextView = sheetView.findViewById(R.id.txtMaxPrice);
         SeekBar minPriceSeekBar = sheetView.findViewById(R.id.seekMinPrice);
@@ -213,7 +228,6 @@ public class RoomBookingActivity extends AppCompatActivity {
 
         final String[] pendingCategory = {filterCategory};
         final Set<String> pendingViews = new HashSet<>(filterViews);
-        final int[] pendingGuests = {filterMinGuests};
 
         Runnable renderCategoryChips = () -> {
             styleChip(chipAllRooms, pendingCategory[0] == null);
@@ -224,11 +238,7 @@ public class RoomBookingActivity extends AppCompatActivity {
             styleChip(chipViewOcean, pendingViews.contains("sea"));
             styleChip(chipViewGarden, pendingViews.contains("garden"));
             styleChip(chipViewPool, pendingViews.contains("pool"));
-        };
-        Runnable renderGuestChips = () -> {
-            styleChip(chipGuests2, pendingGuests[0] == 2);
-            styleChip(chipGuests3, pendingGuests[0] == 3);
-            styleChip(chipGuests4, pendingGuests[0] == 4);
+            styleChip(chipViewStreet, pendingViews.contains("street"));
         };
 
         chipAllRooms.setOnClickListener(view -> {
@@ -245,7 +255,16 @@ public class RoomBookingActivity extends AppCompatActivity {
         });
 
         View.OnClickListener toggleView = view -> {
-            String value = view == chipViewOcean ? "sea" : view == chipViewGarden ? "garden" : "pool";
+            String value;
+            if (view == chipViewOcean) {
+                value = "sea";
+            } else if (view == chipViewGarden) {
+                value = "garden";
+            } else if (view == chipViewPool) {
+                value = "pool";
+            } else {
+                value = "street";
+            }
             if (!pendingViews.remove(value)) {
                 pendingViews.add(value);
             }
@@ -254,15 +273,7 @@ public class RoomBookingActivity extends AppCompatActivity {
         chipViewOcean.setOnClickListener(toggleView);
         chipViewGarden.setOnClickListener(toggleView);
         chipViewPool.setOnClickListener(toggleView);
-
-        View.OnClickListener pickGuests = view -> {
-            int value = view == chipGuests2 ? 2 : view == chipGuests3 ? 3 : 4;
-            pendingGuests[0] = pendingGuests[0] == value ? 0 : value;
-            renderGuestChips.run();
-        };
-        chipGuests2.setOnClickListener(pickGuests);
-        chipGuests3.setOnClickListener(pickGuests);
-        chipGuests4.setOnClickListener(pickGuests);
+        chipViewStreet.setOnClickListener(toggleView);
 
         minPriceSeekBar.setMax(PRICE_SLIDER_MAX);
         maxPriceSeekBar.setMax(PRICE_SLIDER_MAX);
@@ -297,14 +308,12 @@ public class RoomBookingActivity extends AppCompatActivity {
 
         renderCategoryChips.run();
         renderViewChips.run();
-        renderGuestChips.run();
 
         sheetView.findViewById(R.id.btnCloseFilter).setOnClickListener(view -> dialog.dismiss());
         sheetView.findViewById(R.id.btnApplyFilter).setOnClickListener(view -> {
             filterCategory = pendingCategory[0];
             filterViews.clear();
             filterViews.addAll(pendingViews);
-            filterMinGuests = pendingGuests[0];
             filterMinPrice = minPriceSeekBar.getProgress();
             filterMaxPrice = maxPriceSeekBar.getProgress();
             dialog.dismiss();

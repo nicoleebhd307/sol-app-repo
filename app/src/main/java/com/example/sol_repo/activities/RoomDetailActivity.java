@@ -70,8 +70,6 @@ public class RoomDetailActivity extends AppCompatActivity {
                 });
 
         findViewById(R.id.btnDetailBack).setOnClickListener(view -> finish());
-        findViewById(R.id.btnDetailFavorite).setOnClickListener(view ->
-                Toast.makeText(this, R.string.detail_favorite_soon, Toast.LENGTH_SHORT).show());
         findViewById(R.id.btnReserveNow).setOnClickListener(view -> openCheckout());
     }
 
@@ -113,6 +111,8 @@ public class RoomDetailActivity extends AppCompatActivity {
         }
 
         LayoutInflater inflater = LayoutInflater.from(this);
+        int position = 0;
+        int gap = dpToPx(5); // half of the gap that sits between the two columns
         for (String amenity : roomType.getAmenities().split(",")) {
             String amenityName = amenity.trim();
             if (amenityName.isEmpty()) {
@@ -124,11 +124,14 @@ public class RoomDetailActivity extends AppCompatActivity {
                     .setImageResource(RoomAssets.amenityIconFor(amenityName));
             ((TextView) itemView.findViewById(R.id.txtAmenityName)).setText(amenityName);
 
+            boolean leftColumn = position % 2 == 0;
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            params.setMargins(0, 0, dpToPx(10), dpToPx(10));
+            // Only put a small gap between the two columns — no wasted margin on the outer edges.
+            params.setMargins(leftColumn ? 0 : gap, 0, leftColumn ? gap : 0, dpToPx(10));
             amenitiesGrid.addView(itemView, params);
+            position++;
         }
     }
 

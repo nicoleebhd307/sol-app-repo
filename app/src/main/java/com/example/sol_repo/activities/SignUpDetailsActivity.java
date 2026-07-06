@@ -9,7 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.os.LocaleListCompat;
 
 import com.example.sol_repo.R;
 import com.example.sol_repo.dals.FirebaseCallback;
@@ -148,6 +150,9 @@ public class SignUpDetailsActivity extends AppCompatActivity {
                         }
 
                         sessionManager.saveLoginSession(customer, true);
+                        // Apply the language the user picked so the app renders in that locale.
+                        AppCompatDelegate.setApplicationLocales(
+                                LocaleListCompat.forLanguageTags(selectedLanguage));
                         Toast.makeText(SignUpDetailsActivity.this,
                                 getString(R.string.details_success, firstName(customer.getFullName())),
                                 Toast.LENGTH_LONG).show();

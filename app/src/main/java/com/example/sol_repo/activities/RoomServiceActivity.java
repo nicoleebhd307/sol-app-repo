@@ -2,6 +2,8 @@ package com.example.sol_repo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,13 +21,15 @@ import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.MenuItem;
 import com.example.sol_repo.models.RoomServiceOrder;
+import com.example.sol_repo.utils.BottomNavHelper;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.ImageLoader;
-import com.example.sol_repo.utils.OrderTimeline;
 import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.RoomServiceCart;
 import com.example.sol_repo.utils.SessionManager;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,6 +56,16 @@ public class RoomServiceActivity extends AppCompatActivity {
     private String selectedCategory = "all";
     private String searchQuery = "";
 
+    // An order advances one lifecycle step for every STEP_DURATION_MS elapsed since it was placed;
+    // the screen re-checks this every STATUS_UPDATE_INTERVAL_MS while visible.
+    private static final long STEP_DURATION_MS = 5 * 60 * 1000L;
+    private static final long STATUS_UPDATE_INTERVAL_MS = 60 * 1000L;
+    private final SimpleDateFormat orderTimestampFormat =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    private final Handler statusHandler = new Handler(Looper.getMainLooper());
+    private Runnable statusTick;
+    private boolean showAllOrders = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +83,17 @@ public class RoomServiceActivity extends AppCompatActivity {
         menuContainer = findViewById(R.id.listMenuItems);
         categoriesRow = findViewById(R.id.rowCategories);
 
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.SERVICES);
+
+        statusTick = () -> {
+            bindOrdersList();
+            startStatusUpdates();
+        };
+        findViewById(R.id.btnViewAllOrders).setOnClickListener(view -> {
+            showAllOrders = !showAllOrders;
+            bindOrdersList();
+        });
+
         firebaseDatabaseDal.getBookingForCustomer(sessionManager.getCustomerId(), bookingId, resolvedBooking -> {
             if (resolvedBooking == null) {
                 Toast.makeText(this, R.string.booking_access_denied, Toast.LENGTH_LONG).show();
@@ -80,14 +105,15 @@ public class RoomServiceActivity extends AppCompatActivity {
 
             firebaseDatabaseDal.getMenuItems(items -> {
                 allMenuItems = items;
-                bindStayCard();
+                prefillOrderNote();
                 buildCategoryChips();
                 bindSearch();
                 refreshActiveOrderAndMenu();
+                startStatusUpdates();
             });
         });
 
-        findViewById(R.id.btnViewCart).setOnClickListener(view -> openCart());
+        findViewById(R.id.btnViewCart).setOnClickListener(view -> confirmOrder());
     }
 
     @Override
@@ -95,55 +121,146 @@ public class RoomServiceActivity extends AppCompatActivity {
         super.onResume();
         if (booking != null && allMenuItems != null) {
             refreshActiveOrderAndMenu();
+            startStatusUpdates();
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopStatusUpdates();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopStatusUpdates();
+    }
+
     private void refreshActiveOrderAndMenu() {
-        bindCurrentOrderCard();
+        bindOrdersList();
         renderMenu();
         renderOrderPreview();
     }
 
-    private void bindStayCard() {
-        ((TextView) findViewById(R.id.txtStayRoomType)).setText(
-                booking.getRoomTypeName().toUpperCase(Locale.US));
-        firebaseDatabaseDal.getRoomNumberForBooking(booking.getBookingId(), roomNumber -> {
-            ((TextView) findViewById(R.id.txtStayRoomNumber)).setText(
-                    getString(R.string.rs_room_label, roomNumber));
-            ((TextView) findViewById(R.id.txtDeliverTo)).setText(
-                    getString(R.string.rs_deliver_to, getString(R.string.rs_room_label, roomNumber)));
-        });
-        ((TextView) findViewById(R.id.txtStayBookingCode)).setText(
-                getString(R.string.booking_id_label, booking.getBookingCode()));
-        ((TextView) findViewById(R.id.txtStayStatus)).setText(
-                booking.getStatus().replace('_', ' ').toUpperCase(Locale.US));
+    private void prefillOrderNote() {
+        // Prefill the kitchen note from any note already stored on the cart.
+        ((EditText) findViewById(R.id.inputPreviewNote)).setText(RoomServiceCart.getKitchenNote());
     }
 
-    private void bindCurrentOrderCard() {
-        firebaseDatabaseDal.getActiveRoomServiceOrder(booking.getBookingId(), order -> {
-            View card = findViewById(R.id.cardCurrentOrder);
-            if (order == null) {
-                card.setVisibility(View.GONE);
+    private static final String[] STATUS_FLOW = {"preparing", "on_the_way", "delivered"};
+
+    private static boolean isTerminal(String status) {
+        return "delivered".equals(status) || "cancelled".equals(status);
+    }
+
+    private static int flowIndex(String status) {
+        for (int i = 0; i < STATUS_FLOW.length; i++) {
+            if (STATUS_FLOW[i].equals(status)) {
+                return i;
+            }
+        }
+        return 0; // "confirmed"/unknown are treated as the "preparing" baseline
+    }
+
+    /**
+     * Derives an order's status from how long ago it was placed: it advances one step per
+     * {@link #STEP_DURATION_MS} (preparing → on_the_way → delivered) and never moves backwards.
+     */
+    private String expectedStatusFor(RoomServiceOrder order) {
+        String current = order.getStatus();
+        if ("cancelled".equals(current)) {
+            return current;
+        }
+        long orderedAtMillis;
+        try {
+            orderedAtMillis = orderTimestampFormat.parse(order.getOrderedAt()).getTime();
+        } catch (Exception exception) {
+            return current;
+        }
+        long steps = (System.currentTimeMillis() - orderedAtMillis) / STEP_DURATION_MS;
+        int elapsedIndex = (int) Math.max(0, Math.min(steps, STATUS_FLOW.length - 1));
+        int targetIndex = Math.max(flowIndex(current), elapsedIndex);
+        return STATUS_FLOW[targetIndex];
+    }
+
+    /**
+     * Lists the active room service orders (delivered ones drop off). Each order's status is
+     * derived from elapsed time and persisted, so it keeps advancing across sessions. By default
+     * only the latest order is shown; "View all" reveals the rest. No timeline here — that lives on
+     * the tracking/detail page.
+     */
+    private void bindOrdersList() {
+        firebaseDatabaseDal.getRoomServiceOrders(booking.getBookingId(), orders -> {
+            View section = findViewById(R.id.sectionCurrentOrders);
+            LinearLayout container = findViewById(R.id.listCurrentOrders);
+            TextView viewAll = findViewById(R.id.btnViewAllOrders);
+            container.removeAllViews();
+
+            List<RoomServiceOrder> active = new ArrayList<>();
+            List<String> activeStatuses = new ArrayList<>();
+            if (orders != null) {
+                for (RoomServiceOrder order : orders) {
+                    String expected = expectedStatusFor(order);
+                    // Persist the advancement so the new status sticks in the database.
+                    if (!expected.equals(order.getStatus())) {
+                        firebaseDatabaseDal.updateRoomServiceOrderStatus(
+                                order.getOrderId(), expected, result -> {
+                                });
+                    }
+                    if (!isTerminal(expected)) {
+                        active.add(order);
+                        activeStatuses.add(expected);
+                    }
+                }
+            }
+
+            if (active.isEmpty()) {
+                section.setVisibility(View.GONE);
                 return;
             }
 
-            card.setVisibility(View.VISIBLE);
-            ((TextView) findViewById(R.id.txtCurrentOrderCode)).setText(
-                    getString(R.string.rs_order_id_label, order.getOrderCode()));
-            TextView statusView = findViewById(R.id.txtCurrentOrderStatus);
-            statusView.setText(formatStatus(order.getStatus()).toUpperCase(Locale.US));
-            ((TextView) findViewById(R.id.txtCurrentOrderEta)).setText(
-                    getString(R.string.rs_eta_label) + " " + getString(R.string.rs_eta_value));
-            ((TextView) findViewById(R.id.txtCurrentOrderItems)).setText(
-                    getString(R.string.rs_items_count, order.getItemCount()));
-            ((TextView) findViewById(R.id.txtCurrentOrderTotal)).setText(
-                    CurrencyFormatter.format(order.getTotalAmount()));
+            section.setVisibility(View.VISIBLE);
 
-            OrderTimeline.render(this, findViewById(R.id.rowOrderProgress),
-                    OrderTimeline.stepIndexFor(order.getStatus()), null);
+            // Only show the "View all" toggle when there is more than one active order.
+            if (active.size() > 1) {
+                viewAll.setVisibility(View.VISIBLE);
+                viewAll.setText(showAllOrders ? R.string.rs_show_less : R.string.rs_view_all_orders);
+            } else {
+                viewAll.setVisibility(View.GONE);
+                showAllOrders = false;
+            }
 
-            findViewById(R.id.btnTrackOrder).setOnClickListener(view -> openTracking(order.getOrderId()));
+            int limit = showAllOrders ? active.size() : 1;
+            LayoutInflater inflater = LayoutInflater.from(this);
+            for (int i = 0; i < limit; i++) {
+                RoomServiceOrder order = active.get(i);
+                View row = inflater.inflate(R.layout.item_rs_order, container, false);
+                ((TextView) row.findViewById(R.id.txtRsOrderCode)).setText(
+                        getString(R.string.rs_order_id_label, order.getOrderCode()));
+                ((TextView) row.findViewById(R.id.txtRsOrderMeta)).setText(
+                        getString(R.string.rs_items_count, order.getItemCount())
+                                + " · " + CurrencyFormatter.format(order.getTotalAmount()));
+                ((TextView) row.findViewById(R.id.txtRsOrderStatus)).setText(
+                        formatStatus(activeStatuses.get(i)).toUpperCase(Locale.US));
+
+                row.findViewById(R.id.btnRsOrderTrack).setOnClickListener(
+                        view -> openTracking(order.getOrderId()));
+                row.setOnClickListener(view -> openTracking(order.getOrderId()));
+                container.addView(row);
+            }
         });
+    }
+
+    // ----- Auto status progression (re-checks elapsed time on a timer) -------------------------
+
+    private void startStatusUpdates() {
+        stopStatusUpdates();
+        statusHandler.postDelayed(statusTick, STATUS_UPDATE_INTERVAL_MS);
+    }
+
+    private void stopStatusUpdates() {
+        statusHandler.removeCallbacks(statusTick);
     }
 
     private void buildCategoryChips() {
@@ -297,12 +414,20 @@ public class RoomServiceActivity extends AppCompatActivity {
                 CurrencyFormatter.format(RoomServiceCart.getTotal()));
     }
 
-    private void openCart() {
+    /**
+     * The cart page has been removed from the flow: confirming the order here saves the kitchen
+     * note captured in the "your order" card and jumps straight to payment.
+     */
+    private void confirmOrder() {
         if (RoomServiceCart.isEmpty()) {
             Toast.makeText(this, R.string.rs_cart_empty, Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent intent = new Intent(this, RoomServiceCartActivity.class);
+        EditText noteInput = findViewById(R.id.inputPreviewNote);
+        if (noteInput != null) {
+            RoomServiceCart.setKitchenNote(noteInput.getText().toString().trim());
+        }
+        Intent intent = new Intent(this, RoomServicePaymentActivity.class);
         intent.putExtra(EXTRA_BOOKING_ID, booking.getBookingId());
         startActivity(intent);
     }

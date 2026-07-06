@@ -12,7 +12,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@string/account_nationality"
-        android:src="@drawable/ic_globe" />
+        android:src="@drawable/ic_globe"
+        android:tint="@color/sol_gold_dark" />
 
     <LinearLayout
         android:layout_width="0dp"

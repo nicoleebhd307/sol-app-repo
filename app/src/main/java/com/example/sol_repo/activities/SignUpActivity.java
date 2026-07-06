@@ -58,7 +58,6 @@ public class SignUpActivity extends AppCompatActivity {
 
         buildAgreeText();
 
-        findViewById(R.id.btnSignupBack).setOnClickListener(view -> finish());
         findViewById(R.id.btnGoToLogin).setOnClickListener(view -> finish());
         findViewById(R.id.agreeRow).setOnClickListener(view -> toggleAgree());
 

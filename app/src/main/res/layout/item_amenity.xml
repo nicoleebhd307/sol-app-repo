@@ -2,18 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="0dp"
-    android:layout_height="48dp"
+    android:layout_height="wrap_content"
+    android:minHeight="52dp"
     android:background="@drawable/bg_amenity_item"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="10dp">
+    android:paddingStart="14dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/imgAmenityIcon"
-        android:layout_width="19dp"
-        android:layout_height="19dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
         android:contentDescription="@null"
+        android:tint="@color/sol_gold_dark"
         tools:src="@drawable/ic_wifi" />
 
     <TextView
@@ -24,7 +28,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:fontFamily="@font/plus_jakarta_sans"
-        android:singleLine="true"
+        android:maxLines="2"
         android:textColor="@color/sol_text_primary"
         android:textSize="13sp"
         tools:text="Free Wi-Fi" />

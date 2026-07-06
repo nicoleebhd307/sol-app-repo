@@ -12,7 +12,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@string/account_email"
-        android:src="@drawable/ic_mail" />
+        android:src="@drawable/ic_mail"
+        android:tint="@color/sol_gold_dark" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -34,11 +35,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:ellipsize="end"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
             android:fontFamily="@font/plus_jakarta_sans"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textColor="@color/sol_text_primary"
-            android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>
