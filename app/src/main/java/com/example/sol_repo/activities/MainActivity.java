@@ -77,10 +77,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Status field now shows the assigned room number for this booking.
         TextView roomNumberView = findViewById(R.id.txtBookingStatus);
-        firebaseDatabaseDal.getRoomNumberForBooking(bookingSummary.getBookingId(), roomNumber ->
-                roomNumberView.setText(roomNumber == null || roomNumber.isEmpty()
-                        ? getString(R.string.account_unknown_value)
-                        : roomNumber));
+        String roomNumber = bookingSummary.getRoomNumber();
+        if (roomNumber != null && !roomNumber.isEmpty()) {
+            roomNumberView.setText(roomNumber);
+        } else {
+            firebaseDatabaseDal.getRoomNumberForBooking(bookingSummary.getBookingId(), number ->
+                    roomNumberView.setText(number == null || number.isEmpty()
+                            ? getString(R.string.account_unknown_value)
+                            : number));
+        }
 
         LinearLayout servicesContainer = findViewById(R.id.listHomeServices);
         LinearLayout recommendationsContainer = findViewById(R.id.listRecommendations);
@@ -90,21 +95,32 @@ public class MainActivity extends AppCompatActivity {
         firebaseDatabaseDal.getRecommendations(recommendations ->
                 new RecommendationAdapter(this, recommendations).renderInto(recommendationsContainer));
 
-        String activeBookingId = bookingSummary.getBookingId();
-        findViewById(R.id.quickRoomService).setOnClickListener(view -> {
+        bindServiceTiles(bookingSummary.getBookingId());
+    }
+
+    private void bindServiceTiles(String activeBookingId) {
+        findViewById(R.id.tileRoomService).setOnClickListener(view -> {
             Intent intent = new Intent(this, RoomServiceActivity.class);
             intent.putExtra(RoomServiceActivity.EXTRA_BOOKING_ID, activeBookingId);
             startActivity(intent);
         });
+        findViewById(R.id.tileSouvenirs).setOnClickListener(view -> {
+            Intent intent = new Intent(this, SouvenirStoreActivity.class);
+            intent.putExtra(SouvenirStoreActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
 
-        // Remaining services are not yet available in this build.
+        findViewById(R.id.tileRestaurant).setOnClickListener(view -> {
+            Intent intent = new Intent(this, DiningReservationActivity.class);
+            intent.putExtra(DiningReservationActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
+
         View.OnClickListener comingSoon = view ->
                 Toast.makeText(this, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show();
-        findViewById(R.id.quickRestaurant).setOnClickListener(comingSoon);
-        findViewById(R.id.quickSpa).setOnClickListener(comingSoon);
-        findViewById(R.id.quickTransport).setOnClickListener(comingSoon);
-        findViewById(R.id.quickSouvenir).setOnClickListener(comingSoon);
-        findViewById(R.id.quickMore).setOnClickListener(comingSoon);
+        findViewById(R.id.tileSpa).setOnClickListener(comingSoon);
+        findViewById(R.id.tileTransport).setOnClickListener(comingSoon);
+        findViewById(R.id.tileMore).setOnClickListener(comingSoon);
     }
 
     private String extractFirstName(String fullName) {

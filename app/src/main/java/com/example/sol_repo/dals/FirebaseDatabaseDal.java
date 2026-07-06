@@ -3,6 +3,7 @@ package com.example.sol_repo.dals;
 import com.example.sol_repo.models.BookingCreationResult;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.Customer;
+import com.example.sol_repo.models.DiningTable;
 import com.example.sol_repo.models.HomeServiceItem;
 import com.example.sol_repo.models.MenuItem;
 import com.example.sol_repo.models.OrderCreationResult;
@@ -10,7 +11,9 @@ import com.example.sol_repo.models.OrderLine;
 import com.example.sol_repo.models.RecommendationItem;
 import com.example.sol_repo.models.RoomServiceOrder;
 import com.example.sol_repo.models.RoomType;
+import com.example.sol_repo.models.StoreProduct;
 import com.example.sol_repo.utils.RoomServiceCart;
+import com.example.sol_repo.utils.StoreCart;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,15 +27,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /** Realtime Database backed replacement for the retired MockDatabaseDal (SQLite). */
 public class FirebaseDatabaseDal {
     private static final long BOOKING_CODE_SEED = 1045L;
     private static final long ORDER_CODE_SEED = 1045L;
     private static final long CUSTOMER_ID_SEED = 3L;
+    private static final long STORE_ORDER_SEED = 122L;
+    private static final long DINING_RES_SEED = 1200L;
 
     private final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -199,6 +206,15 @@ public class FirebaseDatabaseDal {
             String roomNumber = snapshot.getValue(String.class);
             callback.onSuccess(roomNumber == null ? "" : roomNumber);
         }, callback::onError);
+    }
+
+    public void getRoomTypeImageUrl(String roomTypeId, FirebaseCallback<String> callback) {
+        if (roomTypeId == null) {
+            callback.onSuccess(null);
+            return;
+        }
+        readOnce(rootRef.child("roomTypes").child(roomTypeId).child("imageUrl"), snapshot ->
+                callback.onSuccess(snapshot.getValue(String.class)), callback::onError);
     }
 
     // ===================== Home dashboard =====================
@@ -623,6 +639,176 @@ public class FirebaseDatabaseDal {
         }, callback::onError);
     }
 
+    // ===================== Souvenir store =====================
+
+    public void getStoreProducts(FirebaseCallback<List<StoreProduct>> callback) {
+        readOnce(rootRef.child("storeProducts"), snapshot -> {
+            List<StoreProduct> products = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                Boolean available = child.child("isAvailable").getValue(Boolean.class);
+                if (available == null || !available) {
+                    continue;
+                }
+                products.add(new StoreProduct(
+                        child.getKey(),
+                        child.child("productName").getValue(String.class),
+                        child.child("category").getValue(String.class),
+                        valueOrZero(child.child("price")),
+                        child.child("description").getValue(String.class),
+                        child.child("imageUrl").getValue(String.class),
+                        valueOrZeroInt(child.child("stockQuantity"))));
+            }
+            callback.onSuccess(products);
+        }, callback::onError);
+    }
+
+    public void createStoreOrder(String bookingId, String customerId, List<StoreCart.Entry> lines,
+                                 double subtotal, double serviceCharge, double tax, double totalAmount,
+                                 String roomNumber, String paymentMethod,
+                                 FirebaseCallback<OrderCreationResult> callback) {
+        nextSequence("storeOrder", STORE_ORDER_SEED, sequence -> {
+            String orderId = rootRef.child("storeOrders").push().getKey();
+            String paymentId = rootRef.child("payments").push().getKey();
+            String orderCode = String.format(Locale.US, "SB-2026-%05d", sequence);
+            String now = currentTimestamp();
+
+            Map<String, Object> items = new HashMap<>();
+            for (StoreCart.Entry entry : lines) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("productName", entry.product.getProductName());
+                item.put("imageUrl", entry.product.getImageUrl());
+                item.put("quantity", entry.quantity);
+                item.put("unitPrice", entry.product.getPrice());
+                items.put(entry.product.getProductId(), item);
+            }
+
+            Map<String, Object> order = new HashMap<>();
+            order.put("orderCode", orderCode);
+            order.put("bookingId", bookingId);
+            order.put("customerId", customerId);
+            order.put("items", items);
+            order.put("subtotal", subtotal);
+            order.put("serviceCharge", serviceCharge);
+            order.put("tax", tax);
+            order.put("totalAmount", totalAmount);
+            order.put("deliveryType", "room_delivery");
+            order.put("roomNumber", roomNumber);
+            order.put("paymentMethod", paymentMethod);
+            order.put("status", "confirmed");
+            order.put("orderedAt", now);
+
+            Map<String, Object> payment = new HashMap<>();
+            payment.put("bookingId", bookingId);
+            payment.put("customerId", customerId);
+            payment.put("amount", totalAmount);
+            payment.put("paymentMethod", paymentMethod);
+            payment.put("paymentType", "store");
+            payment.put("status", "success");
+            payment.put("paidAt", now);
+            payment.put("createdAt", now);
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("/storeOrders/" + orderId, order);
+            updates.put("/storeOrdersByBooking/" + bookingId + "/" + orderId, true);
+            updates.put("/payments/" + paymentId, payment);
+            updates.put("/paymentsByBooking/" + bookingId + "/" + paymentId, true);
+
+            rootRef.updateChildren(updates, (error, ref) -> {
+                if (error != null) {
+                    callback.onError(error.getMessage());
+                } else {
+                    callback.onSuccess(new OrderCreationResult(orderId, orderCode));
+                }
+            });
+        }, callback::onError);
+    }
+
+    // ===================== Restaurant / dining =====================
+
+    public void getDiningTables(FirebaseCallback<List<DiningTable>> callback) {
+        readOnce(rootRef.child("diningTables"), snapshot -> {
+            List<DiningTable> tables = new ArrayList<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                tables.add(new DiningTable(
+                        child.getKey(),
+                        child.child("code").getValue(String.class),
+                        valueOrZeroInt(child.child("capacity")),
+                        child.child("shape").getValue(String.class),
+                        valueOrZeroInt(child.child("sortOrder"))));
+            }
+            tables.sort(Comparator.comparingInt(DiningTable::getSortOrder));
+            callback.onSuccess(tables);
+        }, callback::onError);
+    }
+
+    /** Returns the set of table ids already reserved for the given date + time slot. */
+    public void getBookedTableIds(String date, String timeSlot, FirebaseCallback<Set<String>> callback) {
+        readOnce(rootRef.child("diningReservations"), snapshot -> {
+            Set<String> booked = new HashSet<>();
+            for (DataSnapshot child : snapshot.getChildren()) {
+                String status = child.child("status").getValue(String.class);
+                if (!"pending".equals(status) && !"confirmed".equals(status) && !"completed".equals(status)) {
+                    continue;
+                }
+                if (date.equals(child.child("reservationDate").getValue(String.class))
+                        && timeSlot.equals(child.child("reservationTime").getValue(String.class))) {
+                    String tableId = child.child("tableId").getValue(String.class);
+                    if (tableId != null) {
+                        booked.add(tableId);
+                    }
+                }
+            }
+            callback.onSuccess(booked);
+        }, callback::onError);
+    }
+
+    public void createDiningReservation(String bookingId, String customerId, String tableId, String tableCode,
+                                        int capacity, String date, String timeSlot, String venue,
+                                        FirebaseCallback<OrderCreationResult> callback) {
+        // Guard against a race: re-check the table is still free for this date + slot.
+        getBookedTableIds(date, timeSlot, bookedIds -> {
+            if (bookedIds.contains(tableId)) {
+                callback.onSuccess(null);
+                return;
+            }
+            nextSequence("diningReservation", DINING_RES_SEED, sequence -> {
+                String reservationId = rootRef.child("diningReservations").push().getKey();
+                String reservationCode = String.format(Locale.US, "DR-2026-%04d", sequence);
+                String now = currentTimestamp();
+
+                Map<String, Object> reservation = new HashMap<>();
+                reservation.put("reservationCode", reservationCode);
+                reservation.put("bookingId", bookingId);
+                reservation.put("customerId", customerId);
+                reservation.put("venue", venue);
+                reservation.put("venueType", "restaurant");
+                reservation.put("tableId", tableId);
+                reservation.put("tableCode", tableCode);
+                reservation.put("reservationDate", date);
+                reservation.put("reservationTime", timeSlot);
+                reservation.put("numGuests", capacity);
+                reservation.put("status", "confirmed");
+                reservation.put("createdAt", now);
+
+                Map<String, Object> serviceIndex = new HashMap<>();
+                serviceIndex.put("type", "dining");
+                serviceIndex.put("refId", reservationId);
+
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("/diningReservations/" + reservationId, reservation);
+                updates.put("/servicesByBooking/" + bookingId + "/dining_" + reservationId, serviceIndex);
+
+                rootRef.updateChildren(updates, (error, ref) -> {
+                    if (error != null) {
+                        callback.onError(error.getMessage());
+                    } else {
+                        callback.onSuccess(new OrderCreationResult(reservationId, reservationCode));
+                    }
+                });
+            }, callback::onError);
+        });
+    }
+
     // ===================== Internal chaining helpers =====================
 
     private interface ValueListener<T> {
@@ -722,7 +908,7 @@ public class FirebaseDatabaseDal {
     }
 
     private BookingSummary readBooking(String bookingId, DataSnapshot snapshot) {
-        BookingSummary summary = new BookingSummary(
+        BookingSummary booking = new BookingSummary(
                 bookingId,
                 snapshot.child("bookingCode").getValue(String.class),
                 snapshot.child("roomTypeName").getValue(String.class),
@@ -730,19 +916,9 @@ public class FirebaseDatabaseDal {
                 snapshot.child("checkOutDate").getValue(String.class),
                 valueOrZeroInt(snapshot.child("numGuests")),
                 snapshot.child("status").getValue(String.class));
-        summary.setRoomTypeId(snapshot.child("roomTypeId").getValue(String.class));
-        return summary;
-    }
-
-    /** Reads a room type's photo URL so booking thumbnails can show the real room image. */
-    public void getRoomTypeImageUrl(String roomTypeId, FirebaseCallback<String> callback) {
-        if (roomTypeId == null) {
-            callback.onSuccess(null);
-            return;
-        }
-        readOnce(rootRef.child("roomTypes").child(roomTypeId).child("imageUrl"),
-                snapshot -> callback.onSuccess(snapshot.getValue(String.class)),
-                callback::onError);
+        booking.setRoomTypeId(snapshot.child("roomTypeId").getValue(String.class));
+        booking.setRoomNumber(snapshot.child("roomNumber").getValue(String.class));
+        return booking;
     }
 
     private RoomType readRoomType(DataSnapshot snapshot, int availableRooms) {

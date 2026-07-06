@@ -242,7 +242,7 @@
                             android:fontFamily="@font/plus_jakarta_sans"
                             android:textColor="@color/sol_gold"
                             android:textSize="12sp"
-                            tools:text="Confirmed" />
+                            tools:text="D401" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -302,120 +302,95 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/plus_jakarta_sans"
-                    android:text="@string/home_quick_access"
+                    android:text="@string/home_all_services"
                     android:textColor="@color/sol_text_primary"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <GridLayout
                     android:layout_width="match_parent"
-                    android:layout_height="84dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:columnCount="3">
 
                     <LinearLayout
-                        android:id="@+id/quickRestaurant"
-                        style="@style/AllServiceItem">
+                        android:id="@+id/tileRestaurant"
+                        style="@style/ServiceTile">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_restaurant"
-                            android:src="@drawable/ic_restaurant"
-                            android:tint="@color/sol_gold_dark" />
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_restaurant" />
 
                         <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_restaurant" />
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_restaurant" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/quickRoomService"
-                        style="@style/AllServiceItem">
+                        android:id="@+id/tileRoomService"
+                        style="@style/ServiceTile">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_room_service"
-                            android:src="@drawable/ic_roomservice"
-                            android:tint="@color/sol_gold_dark" />
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_roomservice" />
 
                         <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_room_service" />
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_room_service" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/quickSpa"
-                        style="@style/AllServiceItem">
+                        android:id="@+id/tileSpa"
+                        style="@style/ServiceTile">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_spa"
-                            android:src="@drawable/ic_wellness"
-                            android:tint="@color/sol_gold_dark" />
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_wellness" />
 
                         <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_spa" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="84dp"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/quickTransport"
-                        style="@style/AllServiceItem">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_transport"
-                            android:src="@drawable/ic_transfer"
-                            android:tint="@color/sol_gold_dark" />
-
-                        <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_transport" />
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_spa" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/quickSouvenir"
-                        style="@style/AllServiceItem">
+                        android:id="@+id/tileTransport"
+                        style="@style/ServiceTile">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_souvenir"
-                            android:src="@drawable/ic_bag"
-                            android:tint="@color/sol_gold_dark" />
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_transfer" />
 
                         <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_souvenir" />
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_transport" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/quickMore"
-                        style="@style/AllServiceItem">
+                        android:id="@+id/tileSouvenirs"
+                        style="@style/ServiceTile">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="@string/quick_more"
-                            android:src="@drawable/ic_more"
-                            android:tint="@color/sol_gold_dark" />
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_bag" />
 
                         <TextView
-                            style="@style/AllServiceLabel"
-                            android:text="@string/quick_more" />
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_souvenirs" />
                     </LinearLayout>
-                </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tileMore"
+                        style="@style/ServiceTile">
+
+                        <ImageView
+                            style="@style/ServiceTileIcon"
+                            android:src="@drawable/ic_more" />
+
+                        <TextView
+                            style="@style/ServiceTileLabel"
+                            android:text="@string/service_more" />
+                    </LinearLayout>
+                </GridLayout>
             </LinearLayout>
 
             <LinearLayout
