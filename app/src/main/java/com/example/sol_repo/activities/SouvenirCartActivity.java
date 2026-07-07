@@ -1,6 +1,7 @@
 package com.example.sol_repo.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,14 @@ import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.OrderCreationResult;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.ImageLoader;
+import com.example.sol_repo.utils.MomoClient;
 import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
 import com.example.sol_repo.utils.StoreCart;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 public class SouvenirCartActivity extends AppCompatActivity {
     private FirebaseDatabaseDal firebaseDatabaseDal;
@@ -30,6 +36,10 @@ public class SouvenirCartActivity extends AppCompatActivity {
 
     private LinearLayout itemsContainer;
     private TextView checkoutButton;
+
+    private DatabaseReference paymentStatusRef;
+    private ValueEventListener paymentStatusListener;
+    private boolean paymentHandled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +130,71 @@ public class SouvenirCartActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.store_cart_empty, Toast.LENGTH_SHORT).show();
             return;
         }
+        // Pay via MoMo first; the store order is created only once the IPN confirms success.
+        startMomoPayment();
+    }
 
+    private void startMomoPayment() {
+        checkoutButton.setEnabled(false);
+        Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
+        int amount = (int) Math.round(StoreCart.getTotal());
+        MomoClient.createPayment(amount, bookingId, "Souvenir order", "store",
+                new MomoClient.CreateCallback() {
+                    @Override
+                    public void onCreated(String orderId, String payUrl) {
+                        observePayment(orderId);
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl)));
+                        Toast.makeText(SouvenirCartActivity.this, R.string.momo_waiting,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        checkoutButton.setEnabled(true);
+                        Toast.makeText(SouvenirCartActivity.this, R.string.momo_error,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void observePayment(String orderId) {
+        detachPaymentListener();
+        paymentHandled = false;
+        paymentStatusRef = firebaseDatabaseDal.getPaymentStatusRef(orderId);
+        paymentStatusListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (paymentHandled) {
+                    return;
+                }
+                String status = snapshot.getValue(String.class);
+                if ("success".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    finalizeOrder();
+                } else if ("failed".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    checkoutButton.setEnabled(true);
+                    Toast.makeText(SouvenirCartActivity.this, R.string.momo_failed,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        };
+        paymentStatusRef.addValueEventListener(paymentStatusListener);
+    }
+
+    private void detachPaymentListener() {
+        if (paymentStatusRef != null && paymentStatusListener != null) {
+            paymentStatusRef.removeEventListener(paymentStatusListener);
+        }
+    }
+
+    private void finalizeOrder() {
         double total = Math.round(StoreCart.getTotal() * 100) / 100.0;
         int itemCount = StoreCart.getItemCount();
         checkoutButton.setEnabled(false);
@@ -134,7 +208,7 @@ public class SouvenirCartActivity extends AppCompatActivity {
                 StoreCart.getTax(),
                 total,
                 roomNumber,
-                "room_bill",
+                "e_wallet",
                 new FirebaseCallback<OrderCreationResult>() {
                     @Override
                     public void onSuccess(OrderCreationResult result) {
@@ -163,5 +237,11 @@ public class SouvenirCartActivity extends AppCompatActivity {
                                 R.string.store_order_failed, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detachPaymentListener();
     }
 }

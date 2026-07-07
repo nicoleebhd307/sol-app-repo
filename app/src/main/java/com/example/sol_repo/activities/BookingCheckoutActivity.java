@@ -1,6 +1,7 @@
 package com.example.sol_repo.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.CheckBox;
@@ -18,8 +19,13 @@ import com.example.sol_repo.models.Customer;
 import com.example.sol_repo.models.RoomType;
 import com.example.sol_repo.utils.CurrencyFormatter;
 import com.example.sol_repo.utils.ImageLoader;
+import com.example.sol_repo.utils.MomoClient;
 import com.example.sol_repo.utils.RoomAssets;
 import com.example.sol_repo.utils.SessionManager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,6 +60,14 @@ public class BookingCheckoutActivity extends AppCompatActivity {
     private EditText emailInput;
     private CheckBox acceptPoliciesCheckBox;
     private TextView confirmBookingButton;
+
+    // Guest details captured at confirm time, used after the MoMo deposit succeeds.
+    private String pendingFullName;
+    private String pendingEmail;
+    private String pendingPhone;
+    private DatabaseReference paymentStatusRef;
+    private ValueEventListener paymentStatusListener;
+    private boolean paymentHandled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,9 +210,77 @@ public class BookingCheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        String phone = countryCode.isEmpty() ? mobileNumber : countryCode + mobileNumber;
-        confirmBookingButton.setEnabled(false);
+        pendingFullName = fullName;
+        pendingEmail = email;
+        pendingPhone = countryCode.isEmpty() ? mobileNumber : countryCode + mobileNumber;
 
+        // Pay the deposit via MoMo first; the booking is created only after the IPN confirms.
+        startDepositPayment();
+    }
+
+    private void startDepositPayment() {
+        confirmBookingButton.setEnabled(false);
+        Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
+        int amount = (int) Math.round(dueNow);
+        // No bookingId yet — the booking is created after payment succeeds.
+        MomoClient.createPayment(amount, null, "Room booking deposit", "deposit",
+                new MomoClient.CreateCallback() {
+                    @Override
+                    public void onCreated(String orderId, String payUrl) {
+                        observePayment(orderId);
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl)));
+                        Toast.makeText(BookingCheckoutActivity.this, R.string.momo_waiting,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        confirmBookingButton.setEnabled(true);
+                        Toast.makeText(BookingCheckoutActivity.this, R.string.momo_error,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void observePayment(String orderId) {
+        detachPaymentListener();
+        paymentHandled = false;
+        paymentStatusRef = firebaseDatabaseDal.getPaymentStatusRef(orderId);
+        paymentStatusListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (paymentHandled) {
+                    return;
+                }
+                String status = snapshot.getValue(String.class);
+                if ("success".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    createBookingAfterPayment();
+                } else if ("failed".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    confirmBookingButton.setEnabled(true);
+                    Toast.makeText(BookingCheckoutActivity.this, R.string.momo_failed,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        };
+        paymentStatusRef.addValueEventListener(paymentStatusListener);
+    }
+
+    private void detachPaymentListener() {
+        if (paymentStatusRef != null && paymentStatusListener != null) {
+            paymentStatusRef.removeEventListener(paymentStatusListener);
+        }
+    }
+
+    private void createBookingAfterPayment() {
+        confirmBookingButton.setEnabled(false);
         firebaseDatabaseDal.createBooking(
                 sessionManager.getCustomerId(),
                 roomType.getRoomTypeId(),
@@ -208,9 +290,9 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                 grandTotal,
                 dueNow,
                 "e_wallet",
-                fullName,
-                email,
-                phone,
+                pendingFullName,
+                pendingEmail,
+                pendingPhone,
                 true,
                 new com.example.sol_repo.dals.FirebaseCallback<com.example.sol_repo.models.BookingCreationResult>() {
                     @Override
@@ -231,6 +313,12 @@ public class BookingCheckoutActivity extends AppCompatActivity {
                                 R.string.checkout_booking_failed, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detachPaymentListener();
     }
 
     private void onBookingCreated(String bookingId, String bookingCode) {
