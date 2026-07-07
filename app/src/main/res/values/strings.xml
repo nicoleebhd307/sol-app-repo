@@ -536,4 +536,7 @@
     <string name="cancel_keep">Keep</string>
     <string name="cancel_done">Booking cancelled</string>
     <string name="cancel_failed">Could not cancel. Please try again.</string>
+
+    <!-- Main page headers -->
+    <string name="rs_header_subtitle">Order dishes and drinks to your room.</string>
 </resources>

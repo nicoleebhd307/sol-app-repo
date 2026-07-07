@@ -399,4 +399,8 @@
     <string name="cancel_keep">Giữ lại</string>
     <string name="cancel_done">Đã huỷ đặt</string>
     <string name="cancel_failed">Không thể huỷ. Vui lòng thử lại.</string>
+
+    <!-- Main page headers -->
+    <string name="rs_header_subtitle">Đặt món ăn và đồ uống lên phòng.</string>
+    <string name="account_header_subtitle">Quản lý tài khoản và đặt phòng của bạn.</string>
 </resources>

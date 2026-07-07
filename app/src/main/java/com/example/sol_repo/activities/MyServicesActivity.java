@@ -54,7 +54,6 @@ public class MyServicesActivity extends AppCompatActivity {
         }
 
         BottomNavHelper.setup(this, BottomNavHelper.Tab.STAY);
-        findViewById(R.id.btnMyServicesBack).setOnClickListener(view -> finish());
 
         loadServices();
     }

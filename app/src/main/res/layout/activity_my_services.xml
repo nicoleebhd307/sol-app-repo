@@ -25,41 +25,17 @@
             android:paddingEnd="20dp"
             android:paddingBottom="24dp">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <FrameLayout
-                    android:id="@+id/btnMyServicesBack"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="@string/signup_back">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_arrowleft"
-                        app:tint="@color/sol_gold_dark" />
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/cormorant_garamond"
-                    android:text="@string/nav_my_services"
-                    android:textColor="@color/sol_text_primary"
-                    android:textSize="30sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/nav_my_services"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/inter"

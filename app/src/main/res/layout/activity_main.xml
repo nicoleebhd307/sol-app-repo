@@ -28,6 +28,24 @@
             android:paddingEnd="20dp"
             android:paddingBottom="14dp">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/cormorant_garamond"
+                android:text="@string/nav_home"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/inter"
+                android:text="@string/home_subtitle"
+                android:textColor="@color/sol_text_secondary"
+                android:textSize="14sp" />
+
             <LinearLayout
                 android:id="@+id/bookingCard"
                 android:layout_width="match_parent"
