@@ -1,6 +1,7 @@
 package com.example.sol_repo.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -15,8 +16,13 @@ import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.OrderCreationResult;
 import com.example.sol_repo.utils.CurrencyFormatter;
+import com.example.sol_repo.utils.MomoClient;
 import com.example.sol_repo.utils.RoomServiceCart;
 import com.example.sol_repo.utils.SessionManager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Locale;
 
@@ -25,6 +31,10 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private BookingSummary booking;
     private TextView payNowButton;
+
+    private DatabaseReference paymentStatusRef;
+    private ValueEventListener paymentStatusListener;
+    private boolean paymentHandled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,12 +144,83 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
 
     private void payNow() {
         String method = RoomServiceCart.getPaymentMethod();
-        if ("bank_card".equals(method) && !validateCardFields()) {
+        // E-wallet = MoMo: pay online first, then create the order once the IPN confirms.
+        if ("e_wallet".equals(method)) {
+            startMomoPayment();
+            return;
+        }
+        // Bank card is a local mock: validate fields and create the order immediately.
+        if (!validateCardFields()) {
             Toast.makeText(this, R.string.rs_error_card_fields, Toast.LENGTH_SHORT).show();
             return;
         }
-
         payNowButton.setEnabled(false);
+        finalizeOrder();
+    }
+
+    private void startMomoPayment() {
+        payNowButton.setEnabled(false);
+        Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
+        int amount = (int) Math.round(RoomServiceCart.getTotal());
+        MomoClient.createPayment(amount, booking.getBookingId(), "Room service order", "service",
+                new MomoClient.CreateCallback() {
+                    @Override
+                    public void onCreated(String orderId, String payUrl) {
+                        observePayment(orderId);
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(payUrl)));
+                        Toast.makeText(RoomServicePaymentActivity.this, R.string.momo_waiting,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        payNowButton.setEnabled(true);
+                        Toast.makeText(RoomServicePaymentActivity.this, R.string.momo_error,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void observePayment(String orderId) {
+        detachPaymentListener();
+        paymentHandled = false;
+        paymentStatusRef = firebaseDatabaseDal.getPaymentStatusRef(orderId);
+        paymentStatusListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (paymentHandled) {
+                    return;
+                }
+                String status = snapshot.getValue(String.class);
+                if ("success".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    finalizeOrder();
+                } else if ("failed".equals(status)) {
+                    paymentHandled = true;
+                    detachPaymentListener();
+                    payNowButton.setEnabled(true);
+                    Toast.makeText(RoomServicePaymentActivity.this, R.string.momo_failed,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        };
+        paymentStatusRef.addValueEventListener(paymentStatusListener);
+    }
+
+    private void detachPaymentListener() {
+        if (paymentStatusRef != null && paymentStatusListener != null) {
+            paymentStatusRef.removeEventListener(paymentStatusListener);
+        }
+    }
+
+    private void finalizeOrder() {
+        payNowButton.setEnabled(false);
+        String method = RoomServiceCart.getPaymentMethod();
         firebaseDatabaseDal.createRoomServiceOrder(
                 booking.getBookingId(),
                 sessionManager.getCustomerId(),
@@ -178,6 +259,12 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
                                 R.string.rs_order_failed, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detachPaymentListener();
     }
 
     private boolean validateCardFields() {

@@ -384,4 +384,10 @@
     <string name="transfer_offer_message">Là khách hạng Suite, bạn được tặng chuyến đưa đón sân bay miễn phí. Bạn có muốn đặt ngay không?</string>
     <string name="transfer_offer_yes">Đặt xe</string>
     <string name="transfer_offer_no">Để sau</string>
+
+    <!-- MoMo payment -->
+    <string name="momo_starting">Đang khởi tạo thanh toán MoMo…</string>
+    <string name="momo_waiting">Đang chờ hoàn tất thanh toán MoMo…</string>
+    <string name="momo_error">Không thể khởi tạo thanh toán MoMo. Backend đã chạy chưa?</string>
+    <string name="momo_failed">Thanh toán chưa hoàn tất.</string>
 </resources>

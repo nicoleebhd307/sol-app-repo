@@ -502,4 +502,10 @@
     <string name="transfer_offer_message">As a Suite guest, you\'re entitled to a complimentary airport transfer. Would you like to arrange one now?</string>
     <string name="transfer_offer_yes">Book transfer</string>
     <string name="transfer_offer_no">Maybe later</string>
+
+    <!-- MoMo payment -->
+    <string name="momo_starting">Starting MoMo payment…</string>
+    <string name="momo_waiting">Waiting for MoMo payment to complete…</string>
+    <string name="momo_error">Could not start MoMo payment. Is the backend running?</string>
+    <string name="momo_failed">Payment was not completed.</string>
 </resources>

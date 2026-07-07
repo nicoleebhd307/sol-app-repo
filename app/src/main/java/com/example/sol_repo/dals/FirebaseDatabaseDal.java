@@ -1050,6 +1050,11 @@ public class FirebaseDatabaseDal {
         }, callback::onError);
     }
 
+    /** Realtime reference to a MoMo payment's status node, for the app to observe the IPN result. */
+    public DatabaseReference getPaymentStatusRef(String orderId) {
+        return rootRef.child("payments").child(orderId).child("status");
+    }
+
     // ===================== Internal chaining helpers =====================
 
     private interface ValueListener<T> {
