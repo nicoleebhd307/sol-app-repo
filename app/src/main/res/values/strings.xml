@@ -539,4 +539,12 @@
 
     <!-- Main page headers -->
     <string name="rs_header_subtitle">Order dishes and drinks to your room.</string>
+
+    <!-- My Services filter -->
+    <string name="my_services_search_hint">Search your services</string>
+    <string name="svc_filter_all">All</string>
+    <string name="svc_filter_restaurant">Restaurant</string>
+    <string name="svc_filter_spa">Spa</string>
+    <string name="svc_filter_transfer">Transfer</string>
+    <string name="svc_filter_souvenir">Souvenirs</string>
 </resources>

@@ -403,4 +403,12 @@
     <!-- Main page headers -->
     <string name="rs_header_subtitle">Đặt món ăn và đồ uống lên phòng.</string>
     <string name="account_header_subtitle">Quản lý tài khoản và đặt phòng của bạn.</string>
+
+    <!-- My Services filter -->
+    <string name="my_services_search_hint">Tìm dịch vụ của bạn</string>
+    <string name="svc_filter_all">Tất cả</string>
+    <string name="svc_filter_restaurant">Nhà hàng</string>
+    <string name="svc_filter_spa">Spa</string>
+    <string name="svc_filter_transfer">Đưa đón</string>
+    <string name="svc_filter_souvenir">Lưu niệm</string>
 </resources>

@@ -1,13 +1,18 @@
 package com.example.sol_repo.activities;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.sol_repo.R;
 import com.example.sol_repo.adapters.HomeServiceAdapter;
@@ -31,9 +36,19 @@ import java.util.Locale;
 public class MyServicesActivity extends AppCompatActivity {
     public static final String EXTRA_BOOKING_ID = "booking_id";
 
+    // Filter category keys map to HomeServiceItem.iconType ("all" shows everything).
+    private static final String[] CATEGORY_KEYS = {"all", "restaurant", "wellness", "transfer", "souvenir"};
+    private static final int[] CATEGORY_LABELS = {
+            R.string.svc_filter_all, R.string.svc_filter_restaurant, R.string.svc_filter_spa,
+            R.string.svc_filter_transfer, R.string.svc_filter_souvenir};
+
     private FirebaseDatabaseDal firebaseDatabaseDal;
     private SessionManager sessionManager;
     private String bookingId;
+
+    private final List<HomeServiceItem> allServices = new ArrayList<>();
+    private String selectedCategory = "all";
+    private String searchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,31 +70,115 @@ public class MyServicesActivity extends AppCompatActivity {
 
         BottomNavHelper.setup(this, BottomNavHelper.Tab.STAY);
 
+        buildCategoryChips();
+        bindSearch();
         loadServices();
     }
 
     private void loadServices() {
-        LinearLayout container = findViewById(R.id.listMyServices);
-        TextView emptyView = findViewById(R.id.txtMyServicesEmpty);
-
         firebaseDatabaseDal.getHomeServices(bookingId, services -> {
-            List<HomeServiceItem> filtered = new ArrayList<>();
+            allServices.clear();
             for (HomeServiceItem service : services) {
                 // Exclude Food & Drinks (room service) orders from My Services.
                 if (!"roomservice".equals(service.getIconType())) {
-                    filtered.add(service);
+                    allServices.add(service);
                 }
             }
-            List<HomeServiceItem> ordered = sortByNewest(filtered);
-
-            boolean empty = ordered.isEmpty();
-            container.setVisibility(empty ? View.GONE : View.VISIBLE);
-            emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
-
-            new HomeServiceAdapter(this, ordered)
-                    .setOnServiceClickListener(this::showServiceDetail)
-                    .renderInto(container);
+            List<HomeServiceItem> ordered = sortByNewest(allServices);
+            allServices.clear();
+            allServices.addAll(ordered);
+            applyFilters();
         });
+    }
+
+    /** Renders the services matching the selected category chip and the search query. */
+    private void applyFilters() {
+        LinearLayout container = findViewById(R.id.listMyServices);
+        TextView emptyView = findViewById(R.id.txtMyServicesEmpty);
+
+        List<HomeServiceItem> shown = new ArrayList<>();
+        for (HomeServiceItem service : allServices) {
+            if (!"all".equals(selectedCategory) && !selectedCategory.equals(service.getIconType())) {
+                continue;
+            }
+            if (!searchQuery.isEmpty() && !matchesQuery(service)) {
+                continue;
+            }
+            shown.add(service);
+        }
+
+        boolean empty = shown.isEmpty();
+        container.setVisibility(empty ? View.GONE : View.VISIBLE);
+        emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+
+        new HomeServiceAdapter(this, shown)
+                .setOnServiceClickListener(this::showServiceDetail)
+                .renderInto(container);
+    }
+
+    private boolean matchesQuery(HomeServiceItem service) {
+        String title = service.getTitle() == null ? "" : service.getTitle().toLowerCase(Locale.US);
+        String subtitle = service.getSubtitle() == null ? "" : service.getSubtitle().toLowerCase(Locale.US);
+        return title.contains(searchQuery) || subtitle.contains(searchQuery);
+    }
+
+    private void buildCategoryChips() {
+        LinearLayout row = findViewById(R.id.rowServiceCategories);
+        row.removeAllViews();
+        for (int i = 0; i < CATEGORY_KEYS.length; i++) {
+            String key = CATEGORY_KEYS[i];
+            TextView chip = new TextView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(38));
+            params.setMarginEnd(dpToPx(8));
+            chip.setLayoutParams(params);
+            chip.setPadding(dpToPx(16), 0, dpToPx(16), 0);
+            chip.setGravity(Gravity.CENTER);
+            chip.setTextSize(13);
+            chip.setTypeface(ResourcesCompat.getFont(this, R.font.plus_jakarta_sans));
+            chip.setText(CATEGORY_LABELS[i]);
+            chip.setOnClickListener(view -> {
+                selectedCategory = key;
+                styleCategoryChips();
+                applyFilters();
+            });
+            row.addView(chip);
+        }
+        styleCategoryChips();
+    }
+
+    private void styleCategoryChips() {
+        LinearLayout row = findViewById(R.id.rowServiceCategories);
+        for (int i = 0; i < row.getChildCount(); i++) {
+            TextView chip = (TextView) row.getChildAt(i);
+            boolean selected = CATEGORY_KEYS[i].equals(selectedCategory);
+            chip.setBackgroundResource(selected
+                    ? R.drawable.bg_chip_gold : R.drawable.bg_chip_unselected);
+            chip.setTextColor(getColor(selected ? R.color.white : R.color.sol_text_primary));
+        }
+    }
+
+    private void bindSearch() {
+        EditText searchInput = findViewById(R.id.inputServiceSearch);
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence text, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence text, int start, int before, int count) {
+                searchQuery = text.toString().trim().toLowerCase(Locale.US);
+                applyFilters();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     private void showServiceDetail(HomeServiceItem service) {
