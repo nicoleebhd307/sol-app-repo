@@ -21,11 +21,10 @@ import java.util.concurrent.Executors;
  */
 public final class MomoClient {
     /**
-     * Backend base URL. {@code 10.0.2.2} is the host machine's localhost as seen from the
-     * Android emulator. For a physical device, change this to your PC's LAN IP (e.g.
-     * http://192.168.1.x:4000) or the ngrok HTTPS URL.
+     * Backend base URL — the deployed MoMo payment service on Render.
+     * (For local dev against the emulator, use "http://10.0.2.2:4000" instead.)
      */
-    public static final String BASE_URL = "http://10.0.2.2:4000";
+    public static final String BASE_URL = "https://sol-app-repo.onrender.com";
 
     private static final Executor IO = Executors.newSingleThreadExecutor();
 
