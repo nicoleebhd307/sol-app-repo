@@ -13,8 +13,8 @@
         android:id="@+id/imgNavServices"
         android:layout_width="25dp"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/nav_services"
-        android:src="@drawable/ic_service" />
+        android:contentDescription="@string/nav_food_drinks"
+        android:src="@drawable/ic_roomservice" />
 
     <TextView
         android:id="@+id/txtNavServices"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/plus_jakarta_sans"
-        android:text="@string/nav_services"
+        android:text="@string/nav_food_drinks"
         android:textColor="@color/color_icon_inactive"
         android:textSize="11sp" />
 </LinearLayout>

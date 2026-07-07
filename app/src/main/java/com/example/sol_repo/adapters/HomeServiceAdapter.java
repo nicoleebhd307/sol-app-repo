@@ -13,12 +13,23 @@ import com.example.sol_repo.models.HomeServiceItem;
 import java.util.List;
 
 public class HomeServiceAdapter {
+
+    public interface OnServiceClickListener {
+        void onServiceClick(HomeServiceItem service);
+    }
+
     private final Context context;
     private final List<HomeServiceItem> services;
+    private OnServiceClickListener clickListener;
 
     public HomeServiceAdapter(Context context, List<HomeServiceItem> services) {
         this.context = context;
         this.services = services;
+    }
+
+    public HomeServiceAdapter setOnServiceClickListener(OnServiceClickListener listener) {
+        this.clickListener = listener;
+        return this;
     }
 
     public void renderInto(LinearLayout container) {
@@ -36,6 +47,12 @@ public class HomeServiceAdapter {
             subtitleView.setText(service.getSubtitle());
             statusView.setText(service.getStatus());
             applyStatusStyle(statusView, service.getStatus());
+
+            if (clickListener != null) {
+                itemView.setClickable(true);
+                itemView.setFocusable(true);
+                itemView.setOnClickListener(view -> clickListener.onServiceClick(service));
+            }
 
             container.addView(itemView);
         }

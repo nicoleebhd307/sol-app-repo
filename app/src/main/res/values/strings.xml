@@ -100,6 +100,7 @@
     <string name="store_items">Items</string>
     <string name="store_total_paid">Total Paid</string>
     <string name="store_back_home">Back to Home</string>
+    <string name="back_home_countdown">%1$s  ·  %2$d s</string>
     <string name="store_concierge_title">Need help? Contact Concierge</string>
     <string name="store_concierge_desc">We\'re here for you 24/7.</string>
 
@@ -154,6 +155,9 @@
     <string name="home_guest_count">%1$d Guests</string>
     <string name="home_my_services">MY SERVICES</string>
     <string name="home_view_all">View all</string>
+    <string name="my_services_subtitle">All the services you\'ve booked for this stay.</string>
+    <string name="my_services_empty">You haven\'t booked any services yet.</string>
+    <string name="my_services_detail_status">Status: %1$s</string>
     <string name="home_quick_access">ALL SERVICES</string>
     <string name="quick_restaurant">Restaurant</string>
     <string name="quick_room_service">Room Service</string>
@@ -172,6 +176,8 @@
     <string name="nav_home">Home</string>
     <string name="nav_stay">Stay</string>
     <string name="nav_services">Services</string>
+    <string name="nav_food_drinks">Food &amp; Drinks</string>
+    <string name="nav_my_services">My Services</string>
     <string name="nav_profile">Profile</string>
     <string name="dashboard_account_summary">Account: %1$s\nStatus: %2$s</string>
     <string name="dashboard_intro">Login succeeded with the local SQLite mock data. Firebase can replace this DAL later without changing the UI flow.</string>
@@ -332,6 +338,7 @@
     <string name="rs_your_items">YOUR ITEMS (%1$d)</string>
     <string name="rs_note_label">ADD A NOTE FOR THE KITCHEN (OPTIONAL)</string>
     <string name="rs_note_hint">e.g. No nuts, less sugar, no ice, allergies…</string>
+    <string name="rs_tracking_note_label">NOTE FOR THE KITCHEN</string>
     <string name="rs_order_summary">ORDER SUMMARY</string>
     <string name="rs_payment_method">PAYMENT METHOD</string>
     <string name="rs_pay_room_bill">Pay to room bill</string>
@@ -421,6 +428,8 @@
     <string name="spa_summary_sessions">Selected sessions: %1$d</string>
     <string name="spa_summary_guests">Guests using spa: %1$d</string>
     <string name="spa_summary_slots">Slots used: %1$d</string>
+    <string name="spa_summary_sessions_short">Sessions: %1$d</string>
+    <string name="spa_summary_slots_short">Slots: %1$d</string>
     <string name="spa_estimated_total">Estimated total:</string>
     <string name="spa_time_note">A slot equals one guest in one 40-minute session. Two guests at the same time use 2 slots.</string>
     <string name="spa_error_pick">Please select at least one session.</string>
@@ -481,6 +490,16 @@
     <string name="transfer_time_format_note">24-hour format supported</string>
     <string name="transfer_time_info">Please enter the time manually. Our concierge will match your transfer to your flight schedule.</string>
     <string name="transfer_error_time">Please enter a valid time (HH:MM).</string>
+
+    <string name="transfer_flight_title">Flight Details</string>
+    <string name="transfer_flight_sub">Enter your flight time and flight number.</string>
+    <string name="transfer_flight_number_label">FLIGHT NUMBER</string>
+    <string name="transfer_flight_number_hint">e.g. VN123</string>
+    <string name="transfer_flight_time_arrival">FLIGHT ARRIVAL TIME (LANDING)</string>
+    <string name="transfer_flight_time_departure">FLIGHT DEPARTURE TIME (TAKE-OFF)</string>
+    <string name="transfer_error_flight">Please enter your flight number.</string>
+    <string name="transfer_confirm_flight">Flight</string>
+    <string name="transfer_flight_value">%1$s  ·  Flight %2$s</string>
 
     <string name="transfer_pickup_confirmed">Pickup Confirmed</string>
     <string name="transfer_dropoff_confirmed">Drop-off Confirmed</string>

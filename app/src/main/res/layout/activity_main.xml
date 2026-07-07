@@ -293,7 +293,7 @@
 
                         <TextView
                             style="@style/ServiceTileLabel"
-                            android:text="@string/service_room_service" />
+                            android:text="@string/nav_food_drinks" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -402,8 +402,11 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/btnHomeServicesViewAll"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:fontFamily="@font/plus_jakarta_sans"
                         android:gravity="center"
                         android:text="@string/home_view_all"

@@ -171,6 +171,7 @@
     <string name="rs_your_items">MÓN ĐÃ CHỌN (%1$d)</string>
     <string name="rs_note_label">GHI CHÚ CHO NHÀ BẾP (TÙY CHỌN)</string>
     <string name="rs_note_hint">VD: Không đậu phộng, ít đường, không đá, dị ứng…</string>
+    <string name="rs_tracking_note_label">GHI CHÚ CHO NHÀ BẾP</string>
     <string name="rs_order_summary">TÓM TẮT ĐƠN HÀNG</string>
     <string name="rs_payment_method">PHƯƠNG THỨC THANH TOÁN</string>
     <string name="rs_pay_room_bill">Ghi vào hóa đơn phòng</string>

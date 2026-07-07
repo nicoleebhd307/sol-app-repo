@@ -76,7 +76,6 @@ public class TransferActivity extends AppCompatActivity {
                 return;
             }
             numGuests = Math.max(1, booking.getNumGuests());
-            bindBookingCard(booking);
             buildStayDates(booking);
             renderDateChips();
             // Enforce Suite-only access regardless of how this screen was reached.
@@ -89,29 +88,12 @@ public class TransferActivity extends AppCompatActivity {
         });
     }
 
-    private void bindBookingCard(BookingSummary booking) {
-        ((TextView) findViewById(R.id.txtTransferRoomType)).setText(
-                booking.getRoomTypeName().toUpperCase(Locale.US));
-        ((TextView) findViewById(R.id.txtTransferBookingCode)).setText(booking.getBookingCode());
-        ((TextView) findViewById(R.id.txtTransferCheckIn)).setText(formatDate(booking.getCheckInDate()));
-        ((TextView) findViewById(R.id.txtTransferCheckOut)).setText(formatDate(booking.getCheckOutDate()));
-        ((TextView) findViewById(R.id.txtTransferGuests)).setText(
-                getString(R.string.home_guest_count, booking.getNumGuests()));
-
-        TextView roomView = findViewById(R.id.txtTransferRoom);
-        String room = booking.getRoomNumber();
-        if (!TextUtils.isEmpty(room)) {
-            roomView.setText(room);
-        } else {
-            firebaseDatabaseDal.getRoomNumberForBooking(bookingId, number ->
-                    roomView.setText(TextUtils.isEmpty(number)
-                            ? getString(R.string.account_unknown_value) : number));
-        }
-    }
-
     private void selectType(String type) {
         transferType = type;
         renderSelection();
+        // Pickup = flight lands (arrival); drop-off = flight departs (take-off).
+        ((TextView) findViewById(R.id.txtFlightTimeLabel)).setText("dropoff".equals(type)
+                ? R.string.transfer_flight_time_departure : R.string.transfer_flight_time_arrival);
         // Reveal the date + time picker once a direction is chosen.
         findViewById(R.id.sectionSchedule).setVisibility(View.VISIBLE);
     }
@@ -201,6 +183,13 @@ public class TransferActivity extends AppCompatActivity {
             return;
         }
 
+        String flightNumber = ((android.widget.EditText) findViewById(R.id.inputFlightNumber))
+                .getText().toString().trim();
+        if (TextUtils.isEmpty(flightNumber)) {
+            Toast.makeText(this, R.string.transfer_error_flight, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         TimePicker timePicker = findViewById(R.id.timePickerTransfer);
         int hour = timePicker.getHour();
         int minute = timePicker.getMinute();
@@ -225,7 +214,7 @@ public class TransferActivity extends AppCompatActivity {
         View button = findViewById(R.id.btnTransferContinue);
         button.setEnabled(false);
         firebaseDatabaseDal.createTransferBooking(bookingId, sessionManager.getCustomerId(), transferType,
-                from, to, dbDate, time24, dateTimeDisplay, numGuests,
+                from, to, dbDate, time24, dateTimeDisplay, flightNumber, numGuests,
                 new FirebaseCallback<OrderCreationResult>() {
                     @Override
                     public void onSuccess(OrderCreationResult result) {
@@ -236,7 +225,8 @@ public class TransferActivity extends AppCompatActivity {
                             return;
                         }
                         startActivity(TransferConfirmActivity.intentFor(TransferActivity.this, bookingId,
-                                result.getOrderCode(), transferType, from, to, dateTimeDisplay, numGuests));
+                                result.getOrderCode(), transferType, from, to, dateTimeDisplay,
+                                flightNumber, numGuests));
                         finish();
                     }
 
@@ -247,14 +237,6 @@ public class TransferActivity extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-    }
-
-    private String formatDate(String rawDate) {
-        try {
-            return displayDateFormat.format(databaseDateFormat.parse(rawDate));
-        } catch (ParseException | NullPointerException exception) {
-            return rawDate;
-        }
     }
 
     private boolean isSameDay(Calendar a, Calendar b) {

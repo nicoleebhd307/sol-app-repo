@@ -11,9 +11,9 @@
 
     <include layout="@layout/nav_item_home" />
 
-    <include layout="@layout/nav_item_stay" />
-
     <include layout="@layout/nav_item_services" />
+
+    <include layout="@layout/nav_item_stay" />
 
     <include layout="@layout/nav_item_profile" />
 </LinearLayout>

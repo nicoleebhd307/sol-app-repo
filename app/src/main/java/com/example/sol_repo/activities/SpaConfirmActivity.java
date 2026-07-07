@@ -3,8 +3,8 @@ package com.example.sol_repo.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,6 +40,7 @@ public class SpaConfirmActivity extends AppCompatActivity {
     }
 
     private String bookingId;
+    private CountDownTimer autoHomeTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +66,26 @@ public class SpaConfirmActivity extends AppCompatActivity {
                 free ? getString(R.string.spa_amount_free) : CurrencyFormatter.format(amount));
 
         findViewById(R.id.btnSpaConfirmBack).setOnClickListener(view -> goHome());
-        findViewById(R.id.btnSpaBackHome).setOnClickListener(view -> goHome());
-        findViewById(R.id.btnSpaConcierge).setOnClickListener(view ->
-                Toast.makeText(this, R.string.store_concierge_desc, Toast.LENGTH_SHORT).show());
+        TextView btnBackHome = findViewById(R.id.btnSpaBackHome);
+        btnBackHome.setOnClickListener(view -> goHome());
+        startAutoHomeCountdown(btnBackHome);
+    }
+
+    private void startAutoHomeCountdown(TextView button) {
+        String label = getString(R.string.store_back_home);
+        autoHomeTimer = new CountDownTimer(10_000, 1_000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) Math.ceil(millisUntilFinished / 1000.0);
+                button.setText(getString(R.string.back_home_countdown, label, seconds));
+            }
+
+            @Override
+            public void onFinish() {
+                goHome();
+            }
+        };
+        autoHomeTimer.start();
     }
 
     private String sessionSummary(ArrayList<String> sessions) {
@@ -81,6 +99,10 @@ public class SpaConfirmActivity extends AppCompatActivity {
     }
 
     private void goHome() {
+        if (autoHomeTimer != null) {
+            autoHomeTimer.cancel();
+            autoHomeTimer = null;
+        }
         Intent intent = new Intent(this, MainActivity.class);
         if (bookingId != null) {
             intent.putExtra(MainActivity.EXTRA_BOOKING_ID, bookingId);
@@ -88,6 +110,15 @@ public class SpaConfirmActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (autoHomeTimer != null) {
+            autoHomeTimer.cancel();
+            autoHomeTimer = null;
+        }
+        super.onDestroy();
     }
 
     @Override

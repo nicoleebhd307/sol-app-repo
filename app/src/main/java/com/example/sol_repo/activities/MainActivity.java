@@ -14,6 +14,7 @@ import com.example.sol_repo.adapters.HomeServiceAdapter;
 import com.example.sol_repo.adapters.RecommendationAdapter;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
+import com.example.sol_repo.models.HomeServiceItem;
 import com.example.sol_repo.utils.BottomNavHelper;
 import com.example.sol_repo.utils.ImageLoader;
 import com.example.sol_repo.utils.RoomAssets;
@@ -23,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -90,8 +92,20 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout servicesContainer = findViewById(R.id.listHomeServices);
         LinearLayout recommendationsContainer = findViewById(R.id.listRecommendations);
 
-        firebaseDatabaseDal.getHomeServices(bookingSummary.getBookingId(), services ->
-                new HomeServiceAdapter(this, services).renderInto(servicesContainer));
+        String activeBookingId = bookingSummary.getBookingId();
+        firebaseDatabaseDal.getHomeServices(activeBookingId, services -> {
+            // Show only the 3 most recent booked services on the home card.
+            List<HomeServiceItem> latest = MyServicesActivity.sortByNewest(services);
+            if (latest.size() > 3) {
+                latest = new java.util.ArrayList<>(latest.subList(0, 3));
+            }
+            new HomeServiceAdapter(this, latest).renderInto(servicesContainer);
+        });
+        findViewById(R.id.btnHomeServicesViewAll).setOnClickListener(view -> {
+            Intent intent = new Intent(this, MyServicesActivity.class);
+            intent.putExtra(MyServicesActivity.EXTRA_BOOKING_ID, activeBookingId);
+            startActivity(intent);
+        });
         firebaseDatabaseDal.getRecommendations(recommendations ->
                 new RecommendationAdapter(this, recommendations).renderInto(recommendationsContainer));
 

@@ -13,6 +13,7 @@ import androidx.core.content.res.ResourcesCompat;
 import com.example.sol_repo.R;
 import com.example.sol_repo.activities.AccountActivity;
 import com.example.sol_repo.activities.MainActivity;
+import com.example.sol_repo.activities.MyServicesActivity;
 import com.example.sol_repo.activities.RoomServiceActivity;
 
 /** Wires the shared bottom navigation bar: highlights the active tab and handles tab switches. */
@@ -30,8 +31,7 @@ public final class BottomNavHelper {
         style(activity, R.id.imgNavProfile, R.id.txtNavProfile, activeTab == Tab.PROFILE);
 
         bind(activity, R.id.navHome, activeTab == Tab.HOME, () -> openHome(activity));
-        bind(activity, R.id.navStay, activeTab == Tab.STAY, () ->
-                Toast.makeText(activity, R.string.nav_coming_soon, Toast.LENGTH_SHORT).show());
+        bind(activity, R.id.navStay, activeTab == Tab.STAY, () -> openMyServices(activity));
         bind(activity, R.id.navServices, activeTab == Tab.SERVICES, () -> openRoomService(activity));
         bind(activity, R.id.navProfile, activeTab == Tab.PROFILE, () -> openProfile(activity));
     }
@@ -83,7 +83,21 @@ public final class BottomNavHelper {
         activity.startActivity(intent);
     }
 
-    /** Services tab opens room service for the current booking session. */
+    /** My Services tab opens the booked-services list for the current booking session. */
+    private static void openMyServices(AppCompatActivity activity) {
+        String bookingId = new SessionManager(activity).getSelectedBookingId();
+        if (bookingId == null) {
+            Toast.makeText(activity, R.string.nav_no_active_stay, Toast.LENGTH_LONG).show();
+            openProfile(activity);
+            return;
+        }
+        Intent intent = new Intent(activity, MyServicesActivity.class);
+        intent.putExtra(MyServicesActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activity.startActivity(intent);
+    }
+
+    /** Food & Drinks tab opens room service for the current booking session. */
     private static void openRoomService(AppCompatActivity activity) {
         String bookingId = new SessionManager(activity).getSelectedBookingId();
         if (bookingId == null) {

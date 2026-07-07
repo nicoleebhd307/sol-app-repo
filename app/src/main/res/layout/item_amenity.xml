@@ -4,7 +4,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:minHeight="52dp"
-    android:background="@drawable/bg_amenity_item"
+    android:background="@drawable/bg_amenity_item_rounded"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="14dp"

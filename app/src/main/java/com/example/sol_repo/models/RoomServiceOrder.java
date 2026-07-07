@@ -8,9 +8,10 @@ public class RoomServiceOrder {
     private final String status;
     private final String orderedAt;
     private final int itemCount;
+    private final String kitchenNote;
 
     public RoomServiceOrder(String orderId, String orderCode, String bookingId, double totalAmount,
-                            String status, String orderedAt, int itemCount) {
+                            String status, String orderedAt, int itemCount, String kitchenNote) {
         this.orderId = orderId;
         this.orderCode = orderCode;
         this.bookingId = bookingId;
@@ -18,6 +19,7 @@ public class RoomServiceOrder {
         this.status = status;
         this.orderedAt = orderedAt;
         this.itemCount = itemCount;
+        this.kitchenNote = kitchenNote;
     }
 
     public String getOrderId() {
@@ -46,5 +48,9 @@ public class RoomServiceOrder {
 
     public String getOrderCode() {
         return orderCode;
+    }
+
+    public String getKitchenNote() {
+        return kitchenNote;
     }
 }

@@ -64,8 +64,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/bg_stepper"
         android:gravity="center_vertical"
         android:orientation="horizontal">

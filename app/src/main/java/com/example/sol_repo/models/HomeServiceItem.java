@@ -5,15 +5,30 @@ public class HomeServiceItem {
     private String subtitle;
     private String status;
     private String iconType;
+    private String createdAt;
 
     public HomeServiceItem() {
     }
 
     public HomeServiceItem(String title, String subtitle, String status, String iconType) {
+        this(title, subtitle, status, iconType, null);
+    }
+
+    public HomeServiceItem(String title, String subtitle, String status, String iconType,
+                           String createdAt) {
         this.title = title;
         this.subtitle = subtitle;
         this.status = status;
         this.iconType = iconType;
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getTitle() {

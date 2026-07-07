@@ -13,7 +13,7 @@
         android:id="@+id/imgNavStay"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:contentDescription="@string/nav_stay"
+        android:contentDescription="@string/nav_my_services"
         android:src="@drawable/ic_stay" />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/plus_jakarta_sans"
-        android:text="@string/nav_stay"
+        android:text="@string/nav_my_services"
         android:textColor="@color/color_icon_inactive"
         android:textSize="11sp" />
 </LinearLayout>

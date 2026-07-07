@@ -259,7 +259,8 @@ public class FirebaseDatabaseDal {
                                 "Room Service",
                                 snapshot.child("orderCode").getValue(String.class),
                                 snapshot.child("status").getValue(String.class),
-                                "roomservice"));
+                                "roomservice",
+                                snapshot.child("createdAt").getValue(String.class)));
                     }
                     countdown.tick();
                 }, error -> countdown.tick());
@@ -285,7 +286,8 @@ public class FirebaseDatabaseDal {
                                 "Souvenirs",
                                 snapshot.child("orderCode").getValue(String.class),
                                 snapshot.child("status").getValue(String.class),
-                                "souvenir"));
+                                "souvenir",
+                                snapshot.child("createdAt").getValue(String.class)));
                     }
                     countdown.tick();
                 }, error -> countdown.tick());
@@ -314,7 +316,8 @@ public class FirebaseDatabaseDal {
                             "dropoff".equals(transferType) ? "Airport Drop-off" : "Airport Pickup",
                             snapshot.child("scheduledDatetime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
-                            "transfer"));
+                            "transfer",
+                            snapshot.child("createdAt").getValue(String.class)));
                 }
                 next.run();
             }, error -> next.run());
@@ -327,7 +330,8 @@ public class FirebaseDatabaseDal {
                             snapshot.child("reservationDate").getValue(String.class) + " "
                                     + snapshot.child("reservationTime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
-                            "restaurant"));
+                            "restaurant",
+                            snapshot.child("createdAt").getValue(String.class)));
                 }
                 next.run();
             }, error -> next.run());
@@ -344,7 +348,8 @@ public class FirebaseDatabaseDal {
                             snapshot.child("scheduledDate").getValue(String.class) + " "
                                     + snapshot.child("scheduledTime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
-                            "wellness"));
+                            "wellness",
+                            snapshot.child("createdAt").getValue(String.class)));
                     next.run();
                 }, error -> next.run());
             }, error -> next.run());
@@ -356,7 +361,8 @@ public class FirebaseDatabaseDal {
                             snapshot.child("reservationDate").getValue(String.class) + " "
                                     + firstSpaSession(snapshot),
                             snapshot.child("status").getValue(String.class),
-                            "wellness"));
+                            "wellness",
+                            snapshot.child("createdAt").getValue(String.class)));
                 }
                 next.run();
             }, error -> next.run());
@@ -1009,7 +1015,7 @@ public class FirebaseDatabaseDal {
      */
     public void createTransferBooking(String bookingId, String customerId, String transferType,
                                       String fromLocation, String toLocation, String date, String time24,
-                                      String scheduledDisplay, int numGuests,
+                                      String scheduledDisplay, String flightNumber, int numGuests,
                                       FirebaseCallback<OrderCreationResult> callback) {
         nextSequence("transferBooking", TRANSFER_BOOKING_SEED, sequence -> {
             String transferId = rootRef.child("transferBookings").push().getKey();
@@ -1027,6 +1033,7 @@ public class FirebaseDatabaseDal {
             transfer.put("reservationDate", date);
             transfer.put("reservationTime", time24);
             transfer.put("scheduledDatetime", scheduledDisplay);
+            transfer.put("flightNumber", flightNumber);
             transfer.put("numGuests", numGuests);
             transfer.put("status", "pending");
             transfer.put("createdAt", now);
@@ -1195,7 +1202,8 @@ public class FirebaseDatabaseDal {
                 valueOrZero(snapshot.child("totalAmount")),
                 snapshot.child("status").getValue(String.class),
                 snapshot.child("orderedAt").getValue(String.class),
-                itemCount);
+                itemCount,
+                snapshot.child("kitchenNote").getValue(String.class));
     }
 
     private String formatVenueTitle(String venueType) {

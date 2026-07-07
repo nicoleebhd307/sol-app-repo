@@ -33,61 +33,37 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_arrowleft" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:contentDescription="@string/logo_content_description"
-                    android:src="@drawable/sol_logo"
+                    android:src="@drawable/ic_arrowleft"
                     app:tint="@color/sol_gold_dark" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/cormorant_garamond"
-                    android:letterSpacing="0.2"
-                    android:text="@string/brand_name"
-                    android:textColor="@color/sol_text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_icon_soft">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_check"
-                app:tint="@color/sol_gold" />
+            </FrameLayout>
         </FrameLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="18dp"
             android:fontFamily="@font/cormorant_garamond"
             android:gravity="center"
             android:text="@string/spa_confirm_title"
             android:textColor="@color/sol_text_primary"
             android:textSize="32sp"
             android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_icon_soft_circle">
+
+            <ImageView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_check"
+                app:tint="@color/sol_gold" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -295,25 +271,10 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/btnSpaConcierge"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_gold_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/cormorant_garamond"
-            android:gravity="center"
-            android:text="@string/spa_contact_concierge"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/btnSpaBackHome"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/bg_outline_button"
             android:clickable="true"
             android:focusable="true"

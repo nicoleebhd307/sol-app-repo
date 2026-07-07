@@ -90,31 +90,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:contentDescription="@string/logo_content_description"
-                        android:src="@drawable/sol_logo" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/cormorant_garamond"
-                        android:letterSpacing="0.3"
-                        android:text="@string/brand_name"
-                        android:textColor="@color/white"
-                        android:textSize="15sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:orientation="vertical"
                     android:paddingStart="20dp"
@@ -128,17 +103,6 @@
                         android:text="@string/booking_rooms_title"
                         android:textColor="@color/white"
                         android:textSize="38sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:letterSpacing="0.25"
-                        android:text="@string/brand_tagline"
-                        android:textColor="@color/sol_gold_light"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
                 </LinearLayout>
             </FrameLayout>
 
