@@ -260,7 +260,8 @@ public class FirebaseDatabaseDal {
                                 snapshot.child("orderCode").getValue(String.class),
                                 snapshot.child("status").getValue(String.class),
                                 "roomservice",
-                                snapshot.child("createdAt").getValue(String.class)));
+                                snapshot.child("createdAt").getValue(String.class))
+                                .withRef("roomservice", orderId));
                     }
                     countdown.tick();
                 }, error -> countdown.tick());
@@ -287,7 +288,8 @@ public class FirebaseDatabaseDal {
                                 snapshot.child("orderCode").getValue(String.class),
                                 snapshot.child("status").getValue(String.class),
                                 "souvenir",
-                                snapshot.child("createdAt").getValue(String.class)));
+                                snapshot.child("createdAt").getValue(String.class))
+                                .withRef("store", orderId));
                     }
                     countdown.tick();
                 }, error -> countdown.tick());
@@ -317,7 +319,8 @@ public class FirebaseDatabaseDal {
                             snapshot.child("scheduledDatetime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
                             "transfer",
-                            snapshot.child("createdAt").getValue(String.class)));
+                            snapshot.child("createdAt").getValue(String.class))
+                            .withRef("transfer", refId));
                 }
                 next.run();
             }, error -> next.run());
@@ -331,7 +334,8 @@ public class FirebaseDatabaseDal {
                                     + snapshot.child("reservationTime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
                             "restaurant",
-                            snapshot.child("createdAt").getValue(String.class)));
+                            snapshot.child("createdAt").getValue(String.class))
+                            .withRef("dining", refId));
                 }
                 next.run();
             }, error -> next.run());
@@ -349,7 +353,8 @@ public class FirebaseDatabaseDal {
                                     + snapshot.child("scheduledTime").getValue(String.class),
                             snapshot.child("status").getValue(String.class),
                             "wellness",
-                            snapshot.child("createdAt").getValue(String.class)));
+                            snapshot.child("createdAt").getValue(String.class))
+                            .withRef("wellness", refId));
                     next.run();
                 }, error -> next.run());
             }, error -> next.run());
@@ -362,7 +367,8 @@ public class FirebaseDatabaseDal {
                                     + firstSpaSession(snapshot),
                             snapshot.child("status").getValue(String.class),
                             "wellness",
-                            snapshot.child("createdAt").getValue(String.class)));
+                            snapshot.child("createdAt").getValue(String.class))
+                            .withRef("spa", refId));
                 }
                 next.run();
             }, error -> next.run());
@@ -1060,6 +1066,76 @@ public class FirebaseDatabaseDal {
     /** Realtime reference to a MoMo payment's status node, for the app to observe the IPN result. */
     public DatabaseReference getPaymentStatusRef(String orderId) {
         return rootRef.child("payments").child(orderId).child("status");
+    }
+
+    // ===================== Cancel (soft delete) =====================
+
+    private String nodeForServiceType(String serviceType) {
+        if (serviceType == null) {
+            return null;
+        }
+        switch (serviceType) {
+            case "transfer": return "transferBookings";
+            case "dining": return "diningReservations";
+            case "spa": return "spaBookings";
+            case "wellness": return "wellnessBookings";
+            case "store": return "storeOrders";
+            case "roomservice": return "roomServiceOrders";
+            default: return null;
+        }
+    }
+
+    /**
+     * Soft-cancels a booked service by marking its record {@code status = "cancelled"}. Availability
+     * queries (tables, spa slots) and the home services list already ignore cancelled records, so
+     * this frees the slot without deleting history.
+     */
+    public void cancelService(String serviceType, String refId, FirebaseCallback<Boolean> callback) {
+        String node = nodeForServiceType(serviceType);
+        if (node == null || refId == null) {
+            callback.onSuccess(false);
+            return;
+        }
+        rootRef.child(node).child(refId).child("status").setValue("cancelled", (error, ref) -> {
+            if (error != null) {
+                callback.onError(error.getMessage());
+            } else {
+                callback.onSuccess(true);
+            }
+        });
+    }
+
+    /**
+     * Soft-cancels a room booking (verifying ownership): marks the booking cancelled and releases
+     * its room-calendar hold so the room becomes available again.
+     */
+    public void cancelBooking(String customerId, String bookingId, FirebaseCallback<Boolean> callback) {
+        readOnce(rootRef.child("bookings").child(bookingId), snapshot -> {
+            if (!snapshot.exists()
+                    || !customerId.equals(snapshot.child("customerId").getValue(String.class))) {
+                callback.onSuccess(false);
+                return;
+            }
+            String status = snapshot.child("status").getValue(String.class);
+            if ("cancelled".equals(status) || "checked_out".equals(status)) {
+                callback.onSuccess(false);
+                return;
+            }
+            String roomId = snapshot.child("roomId").getValue(String.class);
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("/bookings/" + bookingId + "/status", "cancelled");
+            if (roomId != null) {
+                updates.put("/roomCalendar/" + roomId + "/" + bookingId + "/status", "cancelled");
+            }
+            rootRef.updateChildren(updates, (error, ref) -> {
+                if (error != null) {
+                    callback.onError(error.getMessage());
+                } else {
+                    callback.onSuccess(true);
+                }
+            });
+        }, callback::onError);
     }
 
     // ===================== Internal chaining helpers =====================

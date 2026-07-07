@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sol_repo.R;
 import com.example.sol_repo.adapters.HomeServiceAdapter;
+import com.example.sol_repo.dals.FirebaseCallback;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.HomeServiceItem;
 import com.example.sol_repo.utils.BottomNavHelper;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * "My Services" — lists every service booked for the current stay (restaurant, spa, transfer,
@@ -84,10 +86,49 @@ public class MyServicesActivity extends AppCompatActivity {
     private void showServiceDetail(HomeServiceItem service) {
         String message = service.getSubtitle()
                 + "\n\n" + getString(R.string.my_services_detail_status, service.getStatus());
-        new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(service.getTitle())
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok, null)
+                .setPositiveButton(android.R.string.ok, null);
+        if (isCancellable(service)) {
+            builder.setNegativeButton(R.string.cancel_booking, (dialog, which) -> confirmCancel(service));
+        }
+        builder.show();
+    }
+
+    /** A service can be cancelled while it is still pending or confirmed. */
+    private boolean isCancellable(HomeServiceItem service) {
+        if (service.getServiceType() == null || service.getRefId() == null) {
+            return false;
+        }
+        String status = service.getStatus() == null ? "" : service.getStatus().toLowerCase(Locale.US);
+        return status.contains("pending") || status.contains("confirmed");
+    }
+
+    private void confirmCancel(HomeServiceItem service) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.cancel_confirm_title)
+                .setMessage(R.string.cancel_confirm_message)
+                .setNegativeButton(R.string.cancel_keep, null)
+                .setPositiveButton(R.string.cancel_booking, (dialog, which) ->
+                        firebaseDatabaseDal.cancelService(service.getServiceType(), service.getRefId(),
+                                new FirebaseCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean ok) {
+                                        Toast.makeText(MyServicesActivity.this,
+                                                ok != null && ok ? R.string.cancel_done : R.string.cancel_failed,
+                                                Toast.LENGTH_SHORT).show();
+                                        if (ok != null && ok) {
+                                            loadServices();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(String messageText) {
+                                        Toast.makeText(MyServicesActivity.this, R.string.cancel_failed,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }))
                 .show();
     }
 

@@ -116,5 +116,19 @@
             android:textColor="@color/sol_gold_dark"
             android:textSize="12sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnCancelBooking"
+            android:layout_width="104dp"
+            android:layout_height="34dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:gravity="center"
+            android:text="@string/cancel_booking"
+            android:textColor="@color/sol_error"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </LinearLayout>
 </LinearLayout>

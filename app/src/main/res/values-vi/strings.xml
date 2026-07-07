@@ -391,4 +391,12 @@
     <string name="momo_waiting">Đang chờ hoàn tất thanh toán MoMo…</string>
     <string name="momo_error">Không thể khởi tạo thanh toán MoMo. Backend đã chạy chưa?</string>
     <string name="momo_failed">Thanh toán chưa hoàn tất.</string>
+
+    <!-- Cancel (soft delete) -->
+    <string name="cancel_booking">Huỷ đặt</string>
+    <string name="cancel_confirm_title">Huỷ đặt này?</string>
+    <string name="cancel_confirm_message">Thao tác này sẽ giải phóng chỗ đã đặt và không thể hoàn tác.</string>
+    <string name="cancel_keep">Giữ lại</string>
+    <string name="cancel_done">Đã huỷ đặt</string>
+    <string name="cancel_failed">Không thể huỷ. Vui lòng thử lại.</string>
 </resources>

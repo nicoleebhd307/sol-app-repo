@@ -211,6 +211,7 @@
     <string name="account_status_current">CURRENT</string>
     <string name="account_status_upcoming">UPCOMING</string>
     <string name="account_status_completed">COMPLETED</string>
+    <string name="account_status_cancelled">CANCELLED</string>
     <string name="account_view_details">View Details</string>
     <string name="account_no_current_stay">Current stay</string>
     <string name="account_no_current_message">No active booking right now.</string>
@@ -527,4 +528,12 @@
     <string name="momo_waiting">Waiting for MoMo payment to complete…</string>
     <string name="momo_error">Could not start MoMo payment. Is the backend running?</string>
     <string name="momo_failed">Payment was not completed.</string>
+
+    <!-- Cancel (soft delete) -->
+    <string name="cancel_booking">Cancel booking</string>
+    <string name="cancel_confirm_title">Cancel this booking?</string>
+    <string name="cancel_confirm_message">This releases your reservation and can\'t be undone.</string>
+    <string name="cancel_keep">Keep</string>
+    <string name="cancel_done">Booking cancelled</string>
+    <string name="cancel_failed">Could not cancel. Please try again.</string>
 </resources>

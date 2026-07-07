@@ -6,6 +6,10 @@ public class HomeServiceItem {
     private String status;
     private String iconType;
     private String createdAt;
+    /** Underlying record type for CRUD (transfer/dining/spa/wellness/store/roomservice). */
+    private String serviceType;
+    /** Key of the underlying record in its node, used to cancel it. */
+    private String refId;
 
     public HomeServiceItem() {
     }
@@ -61,6 +65,21 @@ public class HomeServiceItem {
 
     public void setIconType(String iconType) {
         this.iconType = iconType;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public String getRefId() {
+        return refId;
+    }
+
+    /** Records which underlying record this item maps to, so the UI can cancel it. */
+    public HomeServiceItem withRef(String serviceType, String refId) {
+        this.serviceType = serviceType;
+        this.refId = refId;
+        return this;
     }
 
     @Override

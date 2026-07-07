@@ -8,11 +8,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.ImageView;
 
 import com.example.sol_repo.R;
+import com.example.sol_repo.dals.FirebaseCallback;
 import com.example.sol_repo.dals.FirebaseDatabaseDal;
 import com.example.sol_repo.models.BookingSummary;
 import com.example.sol_repo.models.Customer;
@@ -185,7 +187,11 @@ public class AccountActivity extends AppCompatActivity {
         ((TextView) itemView.findViewById(R.id.txtAccountBookingGuests)).setText(
                 getString(R.string.home_guest_count, booking.getNumGuests()));
 
-        if (active) {
+        if ("cancelled".equals(booking.getStatus())) {
+            statusView.setText(R.string.account_status_cancelled);
+            statusView.setBackgroundResource(R.drawable.bg_status_completed);
+            statusView.setTextColor(getColor(R.color.sol_error));
+        } else if (active) {
             statusView.setText(R.string.account_status_current);
             statusView.setBackgroundResource(R.drawable.bg_status_success);
             statusView.setTextColor(getColor(R.color.color_icon_success));
@@ -201,6 +207,42 @@ public class AccountActivity extends AppCompatActivity {
 
         itemView.findViewById(R.id.btnViewBookingDetails).setOnClickListener(view -> openBooking(booking));
         itemView.setOnClickListener(view -> openBooking(booking));
+
+        // Upcoming stays can still be cancelled (soft delete — frees the room).
+        View cancelButton = itemView.findViewById(R.id.btnCancelBooking);
+        if (upcoming) {
+            cancelButton.setVisibility(View.VISIBLE);
+            cancelButton.setOnClickListener(view -> confirmCancelBooking(booking));
+        } else {
+            cancelButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void confirmCancelBooking(BookingSummary booking) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.cancel_confirm_title)
+                .setMessage(R.string.cancel_confirm_message)
+                .setNegativeButton(R.string.cancel_keep, null)
+                .setPositiveButton(R.string.cancel_booking, (dialog, which) ->
+                        firebaseDatabaseDal.cancelBooking(sessionManager.getCustomerId(),
+                                booking.getBookingId(), new FirebaseCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean ok) {
+                                        Toast.makeText(AccountActivity.this,
+                                                ok != null && ok ? R.string.cancel_done : R.string.cancel_failed,
+                                                Toast.LENGTH_SHORT).show();
+                                        if (ok != null && ok) {
+                                            bindBookings();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(String messageText) {
+                                        Toast.makeText(AccountActivity.this, R.string.cancel_failed,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }))
+                .show();
     }
 
     private void openBooking(BookingSummary booking) {
