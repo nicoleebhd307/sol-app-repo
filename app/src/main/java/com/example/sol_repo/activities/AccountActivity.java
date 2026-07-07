@@ -89,8 +89,6 @@ public class AccountActivity extends AppCompatActivity {
             ImageLoader.loadCircle(findViewById(R.id.imgAccountAvatar), customer.getAvatarUrl(), R.drawable.ic_profile);
         });
 
-        findViewById(R.id.btnEditProfile).setOnClickListener(view ->
-                Toast.makeText(this, R.string.account_edit_profile_soon, Toast.LENGTH_SHORT).show());
         findViewById(R.id.btnBookNewStay).setOnClickListener(view ->
                 startActivity(new Intent(this, RoomBookingActivity.class)));
     }

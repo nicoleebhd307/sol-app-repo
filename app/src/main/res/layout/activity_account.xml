@@ -149,20 +149,6 @@
                             tools:text="Member ID: CU-2026-1045" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/btnEditProfile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_gravity="top"
-                        android:background="@drawable/bg_outline_button"
-                        android:fontFamily="@font/plus_jakarta_sans"
-                        android:gravity="center"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp"
-                        android:text="@string/account_edit_profile"
-                        android:textColor="@color/sol_gold_dark"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
