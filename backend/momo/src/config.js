@@ -36,9 +36,13 @@ const config = {
   },
 };
 
-config.resolvedRedirectUrl = config.redirectUrl
+// Strip any trailing slash so we never build "https://host//api/..." (which 404s).
+const stripSlash = (url) => (url || '').replace(/\/+$/, '');
+config.publicBaseUrl = stripSlash(config.publicBaseUrl);
+
+config.resolvedRedirectUrl = stripSlash(config.redirectUrl)
   || `${config.publicBaseUrl}/api/payments/return`;
-config.resolvedIpnUrl = config.ipnUrl
+config.resolvedIpnUrl = stripSlash(config.ipnUrl)
   || `${config.publicBaseUrl}/api/payments/ipn`;
 
 module.exports = config;
