@@ -25,6 +25,7 @@ import com.example.sol_repo.utils.SessionManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -115,9 +116,17 @@ public class AccountActivity extends AppCompatActivity {
         }
     }
 
-    private void renderBookings(List<BookingSummary> bookings) {
+    private void renderBookings(List<BookingSummary> allBookings) {
         bookingsContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
+
+        // Cancelled bookings are hidden from the profile.
+        List<BookingSummary> bookings = new ArrayList<>();
+        for (BookingSummary booking : allBookings) {
+            if (!"cancelled".equals(booking.getStatus())) {
+                bookings.add(booking);
+            }
+        }
 
         if (bookings.isEmpty()) {
             View emptyView = inflater.inflate(R.layout.item_booking_empty, bookingsContainer, false);
