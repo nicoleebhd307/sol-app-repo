@@ -205,8 +205,18 @@ public class AccountActivity extends AppCompatActivity {
             statusView.setTextColor(getColor(R.color.sol_text_secondary));
         }
 
-        itemView.findViewById(R.id.btnViewBookingDetails).setOnClickListener(view -> openBooking(booking));
-        itemView.setOnClickListener(view -> openBooking(booking));
+        // "View details" only opens active stays; hide it for upcoming/other bookings the
+        // guest can't enter yet.
+        View detailsButton = itemView.findViewById(R.id.btnViewBookingDetails);
+        if (active) {
+            detailsButton.setVisibility(View.VISIBLE);
+            detailsButton.setOnClickListener(view -> openBooking(booking));
+            itemView.setOnClickListener(view -> openBooking(booking));
+        } else {
+            detailsButton.setVisibility(View.GONE);
+            itemView.setOnClickListener(null);
+            itemView.setClickable(false);
+        }
 
         // Upcoming stays can still be cancelled (soft delete — frees the room).
         View cancelButton = itemView.findViewById(R.id.btnCancelBooking);
