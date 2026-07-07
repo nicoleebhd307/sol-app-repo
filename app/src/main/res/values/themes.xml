@@ -9,6 +9,18 @@
 
     <style name="Theme.Solrepo" parent="Base.Theme.Solrepo" />
 
+    <!-- Forces dark spinner text on the airport-transfer TimePicker. Without this some
+         OEM themes resolve textColorPrimary to white, making the spinner invisible on the
+         white card (renders as a blank white box). -->
+    <style name="SpinnerTimePicker" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorPrimary">@color/sol_text_primary</item>
+        <item name="android:textColorSecondary">@color/sol_text_secondary</item>
+        <item name="colorControlNormal">@color/sol_gold_dark</item>
+        <item name="android:colorControlNormal">@color/sol_gold_dark</item>
+        <item name="colorAccent">@color/sol_gold_dark</item>
+        <item name="android:colorAccent">@color/sol_gold_dark</item>
+    </style>
+
     <style name="AllServiceItem">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

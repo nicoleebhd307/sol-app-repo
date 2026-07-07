@@ -311,6 +311,7 @@
                     android:id="@+id/timePickerTransfer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:theme="@style/SpinnerTimePicker"
                     android:timePickerMode="spinner" />
 
                 <LinearLayout

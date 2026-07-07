@@ -31,52 +31,102 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txtCartProductName"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="@font/cormorant_garamond"
-            android:singleLine="true"
-            android:textColor="@color/sol_text_primary"
-            android:textSize="21sp"
-            android:textStyle="bold"
-            tools:text="Local Tea Set" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtCartProductQty"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/txtCartProductName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/cormorant_garamond"
+                android:singleLine="true"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                tools:text="Local Tea Set" />
+
+            <TextView
+                android:id="@+id/txtCartProductPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="@color/sol_text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="280.000 ₫" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/inter"
-            android:textColor="@color/sol_text_secondary"
-            android:textSize="14sp"
-            tools:text="Qty: 1" />
-    </LinearLayout>
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="132dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_stepper"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtCartProductPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/plus_jakarta_sans"
-            android:textColor="@color/sol_text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="280.000 ₫" />
+                <TextView
+                    android:id="@+id/btnCartMinus"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/store_decrease"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:text="−"
+                    android:textColor="@color/sol_gold_dark"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
 
-        <ImageView
-            android:id="@+id/btnCartRemove"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:contentDescription="@string/store_decrease"
-            android:src="@drawable/ic_trash" />
+                <TextView
+                    android:id="@+id/txtCartProductQty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:textColor="@color/sol_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="1" />
+
+                <TextView
+                    android:id="@+id/btnCartPlus"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/store_increase"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:gravity="center"
+                    android:text="+"
+                    android:textColor="@color/sol_gold_dark"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/btnCartRemove"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="12dp"
+                android:contentDescription="@string/store_decrease"
+                android:src="@drawable/ic_trash" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

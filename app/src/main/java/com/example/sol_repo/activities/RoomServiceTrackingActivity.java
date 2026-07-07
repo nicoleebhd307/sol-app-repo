@@ -129,6 +129,7 @@ public class RoomServiceTrackingActivity extends AppCompatActivity {
     }
 
     private void bindOrderLines(RoomServiceOrder order) {
+        bindKitchenNote(order);
         firebaseDatabaseDal.getRoomServiceOrderLines(order.getOrderId(), lines -> {
             ((TextView) findViewById(R.id.txtTrackingItemsTitle)).setText(
                     getString(R.string.rs_order_items, order.getItemCount()));
@@ -155,6 +156,17 @@ public class RoomServiceTrackingActivity extends AppCompatActivity {
 
             ((TextView) findViewById(R.id.txtTrackingSubtotal)).setText(CurrencyFormatter.format(subtotal));
         });
+    }
+
+    private void bindKitchenNote(RoomServiceOrder order) {
+        View noteLayout = findViewById(R.id.layoutTrackingNote);
+        String note = order.getKitchenNote();
+        if (note == null || note.trim().isEmpty()) {
+            noteLayout.setVisibility(View.GONE);
+            return;
+        }
+        noteLayout.setVisibility(View.VISIBLE);
+        ((TextView) findViewById(R.id.txtTrackingNote)).setText(note.trim());
     }
 
     private void bindPaymentSummary(BookingSummary booking, RoomServiceOrder order) {

@@ -79,10 +79,23 @@ public class SouvenirCartActivity extends AppCompatActivity {
             ImageLoader.load(row.findViewById(R.id.imgCartProduct), entry.product.getImageUrl(),
                     RoomAssets.MENU_PLACEHOLDER);
             ((TextView) row.findViewById(R.id.txtCartProductName)).setText(entry.product.getProductName());
-            ((TextView) row.findViewById(R.id.txtCartProductQty)).setText(
-                    getString(R.string.store_qty_label, entry.quantity));
+            ((TextView) row.findViewById(R.id.txtCartProductQty)).setText(String.valueOf(entry.quantity));
             ((TextView) row.findViewById(R.id.txtCartProductPrice)).setText(
                     CurrencyFormatter.format(entry.product.getPrice() * entry.quantity));
+
+            row.findViewById(R.id.btnCartMinus).setOnClickListener(view -> {
+                StoreCart.setQuantity(entry.product, entry.quantity - 1);
+                if (StoreCart.isEmpty()) {
+                    finish();
+                } else {
+                    renderCart();
+                }
+            });
+
+            row.findViewById(R.id.btnCartPlus).setOnClickListener(view -> {
+                StoreCart.setQuantity(entry.product, entry.quantity + 1);
+                renderCart();
+            });
 
             row.findViewById(R.id.btnCartRemove).setOnClickListener(view -> {
                 StoreCart.setQuantity(entry.product, 0);

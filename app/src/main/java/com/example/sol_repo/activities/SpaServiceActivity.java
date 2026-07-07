@@ -59,6 +59,8 @@ public class SpaServiceActivity extends AppCompatActivity {
 
     private final List<Calendar> stayDates = new ArrayList<>();
     private int selectedDateIndex = 0;
+    private int guests = 1;
+    private int maxGuests = 1;
     private final Set<String> selectedSessions = new LinkedHashSet<>();
     private Map<String, Integer> bookedBySession = new LinkedHashMap<>();
     private final Map<String, View> sessionTiles = new LinkedHashMap<>();
@@ -81,6 +83,9 @@ public class SpaServiceActivity extends AppCompatActivity {
 
         findViewById(R.id.btnSpaBack).setOnClickListener(view -> finish());
         findViewById(R.id.btnSpaContinue).setOnClickListener(view -> onContinue());
+        findViewById(R.id.btnGuestMinus).setOnClickListener(view -> changeGuests(-1));
+        findViewById(R.id.btnGuestPlus).setOnClickListener(view -> changeGuests(1));
+        renderGuests();
         renderSummary();
 
         firebaseDatabaseDal.getBookingForCustomer(sessionManager.getCustomerId(), bookingId, booking -> {
@@ -89,8 +94,11 @@ public class SpaServiceActivity extends AppCompatActivity {
                 finish();
                 return;
             }
+            maxGuests = Math.max(1, booking.getNumGuests());
+            guests = maxGuests;
             buildStayDates(booking);
             renderDateChips();
+            renderGuests();
             firebaseDatabaseDal.getRoomCategory(booking.getRoomTypeId(), category -> {
                 free = "suite".equalsIgnoreCase(category);
                 ((TextView) findViewById(R.id.btnSpaContinue)).setText(
@@ -193,6 +201,24 @@ public class SpaServiceActivity extends AppCompatActivity {
         }
     }
 
+    private void renderGuests() {
+        ((TextView) findViewById(R.id.txtGuestCount)).setText(
+                getString(R.string.home_guest_count, guests));
+    }
+
+    private void changeGuests(int delta) {
+        int next = guests + delta;
+        if (next < 1 || next > maxGuests) {
+            return;
+        }
+        guests = next;
+        // Drop any selected session that can no longer fit the larger party.
+        selectedSessions.removeIf(session -> remainingFor(session) < guests);
+        renderGuests();
+        renderSessions();
+        renderSummary();
+    }
+
     private void reloadAvailability() {
         if (stayDates.isEmpty()) {
             return;
@@ -226,7 +252,7 @@ public class SpaServiceActivity extends AppCompatActivity {
             View tile = entry.getValue();
             int remaining = remainingFor(session);
             boolean selected = selectedSessions.contains(session);
-            boolean selectable = selected || remaining >= 1;
+            boolean selectable = selected || remaining >= guests;
 
             TextView time = tile.findViewById(R.id.txtSessionTime);
             TextView left = tile.findViewById(R.id.txtSessionLeft);
@@ -259,10 +285,10 @@ public class SpaServiceActivity extends AppCompatActivity {
     private void onSessionClicked(String session) {
         if (selectedSessions.contains(session)) {
             selectedSessions.remove(session);
-        } else if (remainingFor(session) >= 1) {
+        } else if (remainingFor(session) >= guests) {
             selectedSessions.add(session);
         } else {
-            Toast.makeText(this, getString(R.string.spa_error_capacity, 1),
+            Toast.makeText(this, getString(R.string.spa_error_capacity, guests),
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -271,9 +297,9 @@ public class SpaServiceActivity extends AppCompatActivity {
     }
 
     private void renderSummary() {
-        // One slot per selected session (one guest each).
+        // One slot per guest per selected session.
         int sessionCount = selectedSessions.size();
-        int slots = sessionCount;
+        int slots = sessionCount * guests;
         double total = free ? 0 : slots * PRICE_PER_SLOT;
 
         ((TextView) findViewById(R.id.txtSummarySessions)).setText(
@@ -290,8 +316,8 @@ public class SpaServiceActivity extends AppCompatActivity {
             return;
         }
         for (String session : selectedSessions) {
-            if (remainingFor(session) < 1) {
-                Toast.makeText(this, getString(R.string.spa_error_capacity, 1),
+            if (remainingFor(session) < guests) {
+                Toast.makeText(this, getString(R.string.spa_error_capacity, guests),
                         Toast.LENGTH_LONG).show();
                 reloadAvailability();
                 return;
@@ -299,7 +325,7 @@ public class SpaServiceActivity extends AppCompatActivity {
         }
 
         ArrayList<String> sessions = new ArrayList<>(selectedSessions);
-        int slots = sessions.size();
+        int slots = sessions.size() * guests;
         String dbDate = databaseDateFormat.format(stayDates.get(selectedDateIndex).getTime());
         String displayDate = displayDateFormat.format(stayDates.get(selectedDateIndex).getTime());
 
@@ -307,7 +333,7 @@ public class SpaServiceActivity extends AppCompatActivity {
             View button = findViewById(R.id.btnSpaContinue);
             button.setEnabled(false);
             firebaseDatabaseDal.createSpaBooking(bookingId, sessionManager.getCustomerId(), dbDate,
-                    sessions, 1, slots, 0, 0, true, null,
+                    sessions, guests, slots, 0, 0, true, null,
                     new FirebaseCallback<OrderCreationResult>() {
                         @Override
                         public void onSuccess(OrderCreationResult result) {
@@ -318,7 +344,7 @@ public class SpaServiceActivity extends AppCompatActivity {
                                 return;
                             }
                             startActivity(SpaConfirmActivity.intentFor(SpaServiceActivity.this, bookingId,
-                                    result.getOrderCode(), displayDate, 1, sessions, slots, 0, true));
+                                    result.getOrderCode(), displayDate, guests, sessions, slots, 0, true));
                             finish();
                         }
 
@@ -337,7 +363,7 @@ public class SpaServiceActivity extends AppCompatActivity {
         intent.putExtra(SpaPaymentActivity.EXTRA_DATE_DB, dbDate);
         intent.putExtra(SpaPaymentActivity.EXTRA_DATE_DISPLAY, displayDate);
         intent.putStringArrayListExtra(SpaPaymentActivity.EXTRA_SESSIONS, sessions);
-        intent.putExtra(SpaPaymentActivity.EXTRA_GUESTS, 1);
+        intent.putExtra(SpaPaymentActivity.EXTRA_GUESTS, guests);
         intent.putExtra(SpaPaymentActivity.EXTRA_SLOTS, slots);
         intent.putExtra(SpaPaymentActivity.EXTRA_PRICE_PER_SLOT, PRICE_PER_SLOT);
         intent.putExtra(SpaPaymentActivity.EXTRA_TOTAL, slots * PRICE_PER_SLOT);

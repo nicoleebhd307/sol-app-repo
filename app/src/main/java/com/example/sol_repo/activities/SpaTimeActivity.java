@@ -124,9 +124,9 @@ public class SpaTimeActivity extends AppCompatActivity {
     private void addSessionTile(LayoutInflater inflater, GridLayout grid, String session) {
         View tile = inflater.inflate(R.layout.item_spa_session, grid, false);
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-        params.width = 0;
+        params.width = GridLayout.LayoutParams.WRAP_CONTENT;
         params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-        params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+        params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED);
         int margin = dpToPx(4);
         params.setMargins(margin, margin, margin, margin);
         tile.setLayoutParams(params);

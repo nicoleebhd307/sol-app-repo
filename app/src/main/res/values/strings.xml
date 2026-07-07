@@ -338,6 +338,7 @@
     <string name="rs_your_items">YOUR ITEMS (%1$d)</string>
     <string name="rs_note_label">ADD A NOTE FOR THE KITCHEN (OPTIONAL)</string>
     <string name="rs_note_hint">e.g. No nuts, less sugar, no ice, allergies…</string>
+    <string name="rs_tracking_note_label">NOTE FOR THE KITCHEN</string>
     <string name="rs_order_summary">ORDER SUMMARY</string>
     <string name="rs_payment_method">PAYMENT METHOD</string>
     <string name="rs_pay_room_bill">Pay to room bill</string>

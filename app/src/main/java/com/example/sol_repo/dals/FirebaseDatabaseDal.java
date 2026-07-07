@@ -1197,7 +1197,8 @@ public class FirebaseDatabaseDal {
                 valueOrZero(snapshot.child("totalAmount")),
                 snapshot.child("status").getValue(String.class),
                 snapshot.child("orderedAt").getValue(String.class),
-                itemCount);
+                itemCount,
+                snapshot.child("kitchenNote").getValue(String.class));
     }
 
     private String formatVenueTitle(String venueType) {
