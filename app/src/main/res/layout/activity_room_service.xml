@@ -34,15 +34,7 @@
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="14dp"
-                android:fontFamily="@font/inter"
-                android:text="@string/rs_header_subtitle"
-                android:textColor="@color/sol_text_secondary"
-                android:textSize="14sp" />
+
 
             <LinearLayout
                 android:id="@+id/sectionCurrentOrders"
