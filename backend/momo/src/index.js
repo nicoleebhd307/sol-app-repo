@@ -88,14 +88,26 @@ app.post('/api/payments/ipn', async (req, res) => {
   }
 });
 
-/** Browser redirect target after the user finishes in the MoMo app/QR. */
+/**
+ * Browser redirect target after the user finishes on the MoMo page. Deeplinks straight
+ * back into the app (solanbang://payment); the payment screen is still on the app's back
+ * stack — on failure its Pay button is re-enabled so the guest can retry immediately.
+ */
 app.get('/api/payments/return', async (req, res) => {
   const { orderId, resultCode } = req.query;
   const ok = String(resultCode) === '0';
+  const appLink = `solanbang://payment?orderId=${encodeURIComponent(orderId || '')}` +
+    `&resultCode=${encodeURIComponent(resultCode || '')}`;
   res.status(200).send(
-    `<html><body style="font-family:sans-serif;text-align:center;padding:40px">` +
-    `<h2>${ok ? '✅ Payment successful' : '❌ Payment not completed'}</h2>` +
-    `<p>Order: ${orderId || '-'}</p></body></html>`
+    `<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>` +
+    `<body style="font-family:sans-serif;text-align:center;padding:40px">` +
+    `<h2>${ok ? '✅ Thanh toán thành công' : '❌ Thanh toán chưa hoàn tất'}</h2>` +
+    `<p>Mã đơn: ${orderId || '-'}</p>` +
+    `<p>${ok ? 'Đang quay lại ứng dụng…' : 'Quay lại ứng dụng để thử thanh toán lại.'}</p>` +
+    `<p><a href="${appLink}" style="display:inline-block;padding:14px 28px;background:#a50064;` +
+    `color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Quay lại ứng dụng</a></p>` +
+    `<script>setTimeout(function(){ window.location.href = ${JSON.stringify(appLink)}; }, 800);</script>` +
+    `</body></html>`
   );
 });
 

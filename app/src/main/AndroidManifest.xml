@@ -79,6 +79,20 @@
             android:name=".activities.TransferConfirmActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.PaymentReturnActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="payment"
+                    android:scheme="solanbang" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activities.MyServicesActivity"
             android:exported="false" />
 
