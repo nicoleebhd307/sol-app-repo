@@ -36,7 +36,10 @@ app.post('/api/payments/create', async (req, res) => {
       paymentType: req.body.paymentType,
     });
 
-    const gateway = await momo.createPayment({ orderId, requestId, amount, orderInfo });
+    // channel: 'atm' (Napas card web form), 'card' (intl card page) or 'qr' (wallet, default)
+    const gateway = await momo.createPayment({
+      orderId, requestId, amount, orderInfo, channel: req.body.channel,
+    });
 
     if (gateway.resultCode !== 0) {
       await store.updatePaymentStatus(orderId, {

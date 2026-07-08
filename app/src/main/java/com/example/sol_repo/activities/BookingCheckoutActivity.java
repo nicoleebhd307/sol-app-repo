@@ -224,7 +224,7 @@ public class BookingCheckoutActivity extends AppCompatActivity {
         int amount = (int) Math.round(dueNow);
         // No bookingId yet — the booking is created after payment succeeds.
         MomoClient.createPayment(amount, null, "Room booking deposit", "deposit",
-                new MomoClient.CreateCallback() {
+                MomoClient.CHANNEL_ATM, new MomoClient.CreateCallback() {
                     @Override
                     public void onCreated(String orderId, String payUrl) {
                         observePayment(orderId);

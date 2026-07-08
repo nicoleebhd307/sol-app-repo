@@ -9,11 +9,28 @@ function hmacSha256(rawSignature, secretKey) {
 }
 
 /**
+ * Maps a payment channel to a MoMo requestType:
+ *   'atm'  → payWithATM     (domestic Napas/ATM card web form — testable without the app)
+ *   'card' → payWithMethod  (method-selection page incl. international cards)
+ *   'qr'   → captureWallet  (MoMo wallet app / QR scan) — default
+ */
+function requestTypeFor(channel) {
+  if (channel === 'atm') {
+    return 'payWithATM';
+  }
+  if (channel === 'card') {
+    return 'payWithMethod';
+  }
+  return config.momo.requestType; // captureWallet by default
+}
+
+/**
  * Builds the MoMo AIO v2 "create" request (with HMAC-SHA256 signature) and calls the
  * sandbox gateway. Returns the parsed gateway response ({ payUrl, deeplink, qrCodeUrl, ... }).
  */
-async function createPayment({ orderId, requestId, amount, orderInfo, extraData = '' }) {
+async function createPayment({ orderId, requestId, amount, orderInfo, extraData = '', channel }) {
   const { momo, resolvedRedirectUrl, resolvedIpnUrl } = config;
+  const requestType = requestTypeFor(channel);
 
   // Signature fields MUST be in this exact alphabetical order.
   const rawSignature =
@@ -26,7 +43,7 @@ async function createPayment({ orderId, requestId, amount, orderInfo, extraData 
     `&partnerCode=${momo.partnerCode}` +
     `&redirectUrl=${resolvedRedirectUrl}` +
     `&requestId=${requestId}` +
-    `&requestType=${momo.requestType}`;
+    `&requestType=${requestType}`;
 
   const signature = hmacSha256(rawSignature, momo.secretKey);
 
@@ -41,7 +58,7 @@ async function createPayment({ orderId, requestId, amount, orderInfo, extraData 
     redirectUrl: resolvedRedirectUrl,
     ipnUrl: resolvedIpnUrl,
     lang: momo.lang,
-    requestType: momo.requestType,
+    requestType,
     autoCapture: true,
     extraData,
     signature,

@@ -152,8 +152,12 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
         payNowButton.setEnabled(false);
         Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
         int amount = (int) Math.round(RoomServiceCart.getTotal());
+        // Bank card → MoMo's ATM/Napas web form (fill card details there, no app needed);
+        // e-wallet → MoMo wallet QR page.
+        String channel = "e_wallet".equals(RoomServiceCart.getPaymentMethod())
+                ? MomoClient.CHANNEL_WALLET : MomoClient.CHANNEL_ATM;
         MomoClient.createPayment(amount, booking.getBookingId(), "Room service order", "service",
-                new MomoClient.CreateCallback() {
+                channel, new MomoClient.CreateCallback() {
                     @Override
                     public void onCreated(String orderId, String payUrl) {
                         observePayment(orderId);

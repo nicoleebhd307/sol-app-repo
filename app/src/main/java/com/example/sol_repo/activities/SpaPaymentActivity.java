@@ -166,8 +166,12 @@ public class SpaPaymentActivity extends AppCompatActivity {
     private void startMomoPayment() {
         payButton.setEnabled(false);
         Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
+        // Bank card → MoMo's ATM/Napas web form (fill card details there, no app needed);
+        // e-wallet → MoMo wallet QR page.
+        String channel = "e_wallet".equals(selectedMethod)
+                ? MomoClient.CHANNEL_WALLET : MomoClient.CHANNEL_ATM;
         MomoClient.createPayment((int) Math.round(total), bookingId, "Spa session booking", "spa",
-                new MomoClient.CreateCallback() {
+                channel, new MomoClient.CreateCallback() {
                     @Override
                     public void onCreated(String orderId, String payUrl) {
                         observePayment(orderId);

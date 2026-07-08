@@ -152,7 +152,7 @@ public class SouvenirCartActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.momo_starting, Toast.LENGTH_SHORT).show();
         int amount = (int) Math.round(StoreCart.getTotal());
         MomoClient.createPayment(amount, bookingId, "Souvenir order", "store",
-                new MomoClient.CreateCallback() {
+                MomoClient.CHANNEL_ATM, new MomoClient.CreateCallback() {
                     @Override
                     public void onCreated(String orderId, String payUrl) {
                         observePayment(orderId);

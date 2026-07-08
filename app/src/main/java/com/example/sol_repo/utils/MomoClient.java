@@ -37,12 +37,19 @@ public final class MomoClient {
         void onError(String message);
     }
 
+    /** Payment channel: Napas/ATM card web form — testable without the MoMo app. */
+    public static final String CHANNEL_ATM = "atm";
+    /** Payment channel: MoMo wallet (QR / app). */
+    public static final String CHANNEL_WALLET = "qr";
+
     /**
      * Asks the backend to create a MoMo sandbox payment. On success returns the generated
-     * orderId and the payUrl to open. Amount is integer VND.
+     * orderId and the payUrl to open. Amount is integer VND. {@code channel} picks where the
+     * guest completes payment: {@link #CHANNEL_ATM} (card form on the web) or
+     * {@link #CHANNEL_WALLET} (MoMo app / QR).
      */
     public static void createPayment(int amountVnd, String bookingId, String orderInfo,
-                                     String paymentType, CreateCallback callback) {
+                                     String paymentType, String channel, CreateCallback callback) {
         Handler main = new Handler(Looper.getMainLooper());
         IO.execute(() -> {
             HttpURLConnection connection = null;
@@ -54,6 +61,7 @@ public final class MomoClient {
                 }
                 request.put("orderInfo", orderInfo);
                 request.put("paymentType", paymentType);
+                request.put("channel", channel == null ? CHANNEL_ATM : channel);
 
                 URL url = new URL(BASE_URL + "/api/payments/create");
                 connection = (HttpURLConnection) url.openConnection();
