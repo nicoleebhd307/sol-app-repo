@@ -130,8 +130,8 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
         ((ImageView) findViewById(R.id.imgSelectedMethod)).setImageResource(
                 ewallet ? R.drawable.ic_wallet : R.drawable.ic_card);
 
-        findViewById(R.id.cardCardDetails).setVisibility(
-                "bank_card".equals(method) ? View.VISIBLE : View.GONE);
+        // Card details are entered on MoMo's hosted page, not in-app — always hide the mock form.
+        findViewById(R.id.cardCardDetails).setVisibility(View.GONE);
     }
 
     private void renderRadio(View radioFrame, boolean selected) {
@@ -143,19 +143,9 @@ public class RoomServicePaymentActivity extends AppCompatActivity {
     }
 
     private void payNow() {
-        String method = RoomServiceCart.getPaymentMethod();
-        // E-wallet = MoMo: pay online first, then create the order once the IPN confirms.
-        if ("e_wallet".equals(method)) {
-            startMomoPayment();
-            return;
-        }
-        // Bank card is a local mock: validate fields and create the order immediately.
-        if (!validateCardFields()) {
-            Toast.makeText(this, R.string.rs_error_card_fields, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        payNowButton.setEnabled(false);
-        finalizeOrder();
+        // Every method settles on MoMo's hosted page (card or wallet). The order is created
+        // only after MoMo's IPN confirms success — no in-app mock that always succeeds.
+        startMomoPayment();
     }
 
     private void startMomoPayment() {
